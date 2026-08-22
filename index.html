@@ -13,7 +13,7 @@
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; }
 
         /* IMAGEN DE LA OFICINA / HABITACIÓN */
-        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.jpg'); background-size: cover; background-position: center; transform-origin: center center; will-change: transform; transition: background-image 0.1s ease; }
+        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg'); background-size: cover; background-position: center; transform-origin: center center; will-change: transform; transition: background-image 0.1s ease; }
 
         /* CAPA DE LA PUERTA (DOOR.png) */
         #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-image: url('DOOR.png'); background-size: cover; background-position: center; display: none; z-index: 5; pointer-events: none; }
@@ -33,7 +33,7 @@
         /* TRANSICIÓN DE MOVIMIENTO */
         #transition-overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: black; z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-in-out; }
 
-        /* INTERFAZ DE USUARIO (UI) */
+        /* INTERFAZ DE USUARIO (UI) - SIN BARRA DE ENERGÍA */
         #ui-layer { position: absolute; bottom: 30px; right: 40px; z-index: 50; display: flex; align-items: center; gap: 15px; opacity: 0.8; }
         .battery-icon { width: 40px; height: auto; filter: drop-shadow(0px 0px 2px #fff); }
         .battery-bar-container { width: 150px; height: 18px; border: 2px solid #fff; padding: 2px; background: rgba(0,0,0,0.5); }
@@ -178,10 +178,10 @@
             if (wallData && wallData.hasDoor) {
                 isDoorClosed = !isDoorClosed;
                 if (isDoorClosed) {
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.jpg')`;
+                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaON.jpg')`;
                     doorOverlay.style.display = 'block';
                 } else {
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.jpg')`;
+                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg')`;
                     doorOverlay.style.display = 'none';
                 }
             }
@@ -192,7 +192,7 @@
         const imgSala2 = 'Habitacion_2_caminos_segundocamino_izquierda.jpg';
         const imgSala3 = 'Habitacion_2_caminos_segundocamino_derecha.jpg';
         const imgParedCiega = 'Habitacion_Cuarto_cerrado.jpg';
-        const imgSalaPuertaOFF = 'Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.jpg';
+        const imgSalaPuertaOFF = 'Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg';
         const imgFondo = 'Fondo_Habitacion.png';
 
         const mapa = {
@@ -251,7 +251,6 @@
 
             office.style.backgroundImage = `url('${wallData.img}')`;
             
-            // Activar hitbox invisible solo si la habitación actual tiene puerta
             if (wallData.hasDoor) {
                 doorHitbox.style.display = 'block';
             } else {
