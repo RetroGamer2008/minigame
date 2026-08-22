@@ -12,7 +12,7 @@
         /* CONTENEDOR PRINCIPAL */
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; }
 
-        /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO CORREGIDO PARA EL ZOOM */
+        /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO FIJO PARA EL ZOOM */
         #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
         /* CAPA DE LA PUERTA (DOOR.png) */
@@ -41,11 +41,11 @@
         
         #instructions { position: absolute; top: 20px; right: 20px; z-index: 50; font-size: 1.2rem; text-shadow: 2px 2px 0 #000; opacity: 0.7; }
 
-        /* --- MINIMAPA --- */
+        /* --- MINIMAPA CON LA IMAGEN REAL 'Mapa_minijuego' --- */
         #minimap-container { 
-            position: absolute; top: 20px; left: 20px; width: 180px; height: 180px; 
-            background-image: url('Mapa_minijuego_2.png'); background-size: contain; background-repeat: no-repeat; background-position: center; 
-            border: 2px solid #444; z-index: 50; background-color: rgba(0, 0, 0, 0.85); 
+            position: absolute; top: 20px; left: 20px; width: 220px; height: 220px; 
+            background-image: url('Mapa_minijuego.png'); background-size: contain; background-repeat: no-repeat; background-position: center; 
+            border: 2px solid #444; z-index: 50; background-color: rgba(0, 0, 0, 0.9); 
         }
 
         /* FLECHA DEL JUGADOR CON CÍRCULO */
@@ -187,7 +187,7 @@
             }
         }
 
-        // --- MAPA Y HABITACIONES COMPLETAS ---
+        // --- MAPA Y HABITACIONES BASADAS ESTRICTAMENTE EN TU IMAGEN ---
         const imgSala1 = 'Habitacion_3_caminos.jpg';
         const imgSala2 = 'Habitacion_2_caminos_segundocamino_izquierda.jpg';
         const imgSala3 = 'Habitacion_2_caminos_segundocamino_derecha.jpg';
@@ -195,27 +195,46 @@
         const imgSalaPuertaOFF = 'Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg';
         const imgFondo = 'Fondo_Habitacion.png';
 
+        // Estructura adaptada al laberinto principal de tu esquema (punto blanco de inicio abajo)
         const mapa = {
-            'centro': { 
-                x: 85, y: 85, type: 'room', 
+            'inicio': { 
+                x: 110, y: 185, type: 'room', 
                 paredes: [
-                    { dir: 0, img: imgSalaPuertaOFF, link: 'pasillo_norte', hasDoor: true }, 
-                    { dir: 1, img: imgSala2, link: 'pasillo_este', hasDoor: false }, 
-                    { dir: 2, img: imgSala1, link: 'pasillo_sur', hasDoor: false }, 
-                    { dir: 3, img: imgSala3, link: 'pasillo_oeste', hasDoor: false }
+                    { dir: 0, img: imgSalaPuertaOFF, link: 'pasillo_inicio', hasDoor: true }, // Norte (Avanzar)
+                    { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, // Este
+                    { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, // Sur
+                    { dir: 3, img: imgParedCiega, link: null, hasDoor: false }  // Oeste
                 ] 
             },
-            'pasillo_norte': { x: 85, y: 65, type: 'hallway', paredes: [{ dir: 0, img: imgFondo, link: 'norte', hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgFondo, link: 'centro', hasDoor: false }, { dir: 3, img: imgParedCiega, link: null, hasDoor: false }] },
-            'norte': { x: 85, y: 45, type: 'room', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgFondo, link: 'pasillo_norte', hasDoor: false }, { dir: 3, img: imgParedCiega, link: null, hasDoor: false }] },
-            'pasillo_sur': { x: 85, y: 105, type: 'hallway', paredes: [{ dir: 0, img: imgFondo, link: 'centro', hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgFondo, link: 'sur', hasDoor: false }, { dir: 3, img: imgParedCiega, link: null, hasDoor: false }] },
-            'sur': { x: 85, y: 125, type: 'room', paredes: [{ dir: 0, img: imgFondo, link: 'pasillo_sur', hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgParedCiega, link: null, hasDoor: false }] },
-            'pasillo_este': { x: 105, y: 85, type: 'hallway', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgFondo, link: 'este', hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgFondo, link: 'centro', hasDoor: false }] },
-            'este': { x: 125, y: 85, type: 'room', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgFondo, link: 'pasillo_este', hasDoor: false }] },
-            'pasillo_oeste': { x: 65, y: 85, type: 'hallway', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgFondo, link: 'centro', hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgFondo, link: 'oeste', hasDoor: false }] },
-            'oeste': { x: 45, y: 85, type: 'room', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgFondo, link: 'pasillo_oeste', hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgFondo, link: 'pasillo_oeste', hasDoor: false }] }
+            'pasillo_inicio': { 
+                x: 110, y: 155, type: 'hallway', 
+                paredes: [
+                    { dir: 0, img: imgFondo, link: 'centro_laberinto', hasDoor: false }, 
+                    { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, 
+                    { dir: 2, img: imgFondo, link: 'inicio', hasDoor: false }, 
+                    { dir: 3, img: imgParedCiega, link: null, hasDoor: false }
+                ] 
+            },
+            'centro_laberinto': { 
+                x: 110, y: 125, type: 'room', 
+                paredes: [
+                    { dir: 0, img: imgSalaPuertaOFF, link: 'pasillo_arriba_centro', hasDoor: true }, 
+                    { dir: 1, img: imgSala3, link: 'pasillo_derecha_centro', hasDoor: false }, 
+                    { dir: 2, img: imgFondo, link: 'pasillo_inicio', hasDoor: false }, 
+                    { dir: 3, img: imgSala2, link: 'pasillo_izquierda_centro', hasDoor: false }
+                ] 
+            },
+            'pasillo_arriba_centro': { x: 110, y: 95, type: 'hallway', paredes: [{ dir: 0, img: imgFondo, link: 'norte_terminal', hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgFondo, link: 'centro_laberinto', hasDoor: false }, { dir: 3, img: imgParedCiega, link: null, hasDoor: false }] },
+            'norte_terminal': { x: 110, y: 65, type: 'room', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgFondo, link: 'pasillo_arriba_centro', hasDoor: false }, { dir: 3, img: imgParedCiega, link: null, hasDoor: false }] },
+            
+            'pasillo_izquierda_centro': { x: 80, y: 125, type: 'hallway', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgFondo, link: 'centro_laberinto', hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgFondo, link: 'oeste_terminal', hasDoor: false }] },
+            'oeste_terminal': { x: 50, y: 125, type: 'room', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgFondo, link: 'pasillo_izquierda_centro', hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgParedCiega, link: null, hasDoor: false }] },
+
+            'pasillo_derecha_centro': { x: 140, y: 125, type: 'hallway', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgFondo, link: 'este_terminal', hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgFondo, link: 'centro_laberinto', hasDoor: false }] },
+            'este_terminal': { x: 170, y: 125, type: 'room', paredes: [{ dir: 0, img: imgParedCiega, link: null, hasDoor: false }, { dir: 1, img: imgParedCiega, link: null, hasDoor: false }, { dir: 2, img: imgParedCiega, link: null, hasDoor: false }, { dir: 3, img: imgFondo, link: 'pasillo_derecha_centro', hasDoor: false }] }
         };
 
-        let currentRoom = 'centro'; 
+        let currentRoom = 'inicio'; 
         let currentFacing = 0;      
         let currentRotation = 0; 
 
@@ -299,7 +318,7 @@
                     transitionOverlay.style.opacity = '1';
                     setTimeout(() => {
                         office.style.transition = 'none';
-                        currentPanX = 0; // Reinicia el paneo para asegurar centrado al avanzar
+                        currentPanX = 0; // Evita el desplazamiento izquierdo al avanzar
                         updateView();
                         setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100);
                     }, 200);
