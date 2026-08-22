@@ -12,8 +12,8 @@
         /* CONTENEDOR PRINCIPAL */
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; }
 
-        /* IMAGEN DE LA OFICINA / HABITACIÓN */
-        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg'); background-size: cover; background-position: center; transform-origin: center center; will-change: transform; transition: background-image 0.1s ease; }
+        /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO CORREGIDO PARA EL ZOOM */
+        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
         /* CAPA DE LA PUERTA (DOOR.png) */
         #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-image: url('DOOR.png'); background-size: cover; background-position: center; display: none; z-index: 5; pointer-events: none; }
@@ -33,7 +33,7 @@
         /* TRANSICIÓN DE MOVIMIENTO */
         #transition-overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: black; z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-in-out; }
 
-        /* INTERFAZ DE USUARIO (UI) - SIN BARRA DE ENERGÍA */
+        /* INTERFAZ DE USUARIO (UI) */
         #ui-layer { position: absolute; bottom: 30px; right: 40px; z-index: 50; display: flex; align-items: center; gap: 15px; opacity: 0.8; }
         .battery-icon { width: 40px; height: auto; filter: drop-shadow(0px 0px 2px #fff); }
         .battery-bar-container { width: 150px; height: 18px; border: 2px solid #fff; padding: 2px; background: rgba(0,0,0,0.5); }
@@ -41,7 +41,7 @@
         
         #instructions { position: absolute; top: 20px; right: 20px; z-index: 50; font-size: 1.2rem; text-shadow: 2px 2px 0 #000; opacity: 0.7; }
 
-        /* --- MINIMAPA CON TU NUEVA IMAGEN DE FONDO --- */
+        /* --- MINIMAPA --- */
         #minimap-container { 
             position: absolute; top: 20px; left: 20px; width: 180px; height: 180px; 
             background-image: url('Mapa_minijuego_2.png'); background-size: contain; background-repeat: no-repeat; background-position: center; 
@@ -299,6 +299,7 @@
                     transitionOverlay.style.opacity = '1';
                     setTimeout(() => {
                         office.style.transition = 'none';
+                        currentPanX = 0; // Reinicia el paneo para asegurar centrado al avanzar
                         updateView();
                         setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100);
                     }, 200);
