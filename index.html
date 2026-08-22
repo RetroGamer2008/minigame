@@ -13,7 +13,7 @@
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; }
 
         /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO FIJO PARA EL ZOOM */
-        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1_puerta_abierta_sin_puerta.jpg'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
+        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1_puerta_abierta_sin_puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
         /* CAPA DE LA PUERTA (DOOR.png) */
         #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-image: url('DOOR.png'); background-size: cover; background-position: center; display: none; z-index: 5; pointer-events: none; }
@@ -177,21 +177,21 @@
             if (wallData && wallData.hasDoor) {
                 isDoorClosed = !isDoorClosed;
                 if (isDoorClosed) {
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaON.jpg')`;
+                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaON.png')`;
                     doorOverlay.style.display = 'block';
                 } else {
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.jpg')`;
+                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.png')`;
                     doorOverlay.style.display = 'none';
                 }
             }
         }
 
-        // --- IMÁGENES BASE ---
-        const imgPuertaSinPuerta = 'Habitacion_Cuarto_1_puerta_abierta_sin_puerta.jpg';
-        const imgCuartoCerrado = 'Habitacion_Cuarto_cerrado.jpg';
-        const img2CaminosIzq = 'Habitacion_2_caminos_segundocamino_izquierda.jpg';
-        const img3Caminos = 'Habitacion_3_caminos.jpg';
-        const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.jpg';
+        // --- IMÁGENES BASE CORREGIDAS A .PNG ---
+        const imgPuertaSinPuerta = 'Habitacion_Cuarto_1_puerta_abierta_sin_puerta.png';
+        const imgCuartoCerrado = 'Habitacion_Cuarto_cerrado.png';
+        const img2CaminosIzq = 'Habitacion_2_caminos_segundocamino_izquierda.png';
+        const img3Caminos = 'Habitacion_3_caminos.png';
+        const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.png';
 
         // --- MAPA (Primeras 4 Habitaciones) ---
         const mapa = {
@@ -233,7 +233,6 @@
             }
         };
 
-        // El jugador ahora empieza en la habitacion_1
         let currentRoom = 'habitacion_1'; 
         let currentFacing = 0;      
         let currentRotation = 0; 
