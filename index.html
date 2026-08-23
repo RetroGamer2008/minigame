@@ -15,27 +15,27 @@
         /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO FIJO PARA EL ZOOM */
         #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
-        /* CAPA DE LA PUERTA (DOOR.png) CON ANIMACIÓN DE DESLIZAMIENTO */
+        /* CAPA DE LA PUERTA (OCULTA O MANEJADA POR FONDO, MANTENIDA POR ESTRUCTURA) */
         #door-overlay { 
             position: absolute; top: 0; left: 30%; width: 40%; height: 100%; 
-            background-image: url('DOOR.png'); background-size: cover; background-position: center; 
-            z-index: 5; pointer-events: none; 
-            transform: translateY(-100%); /* Oculta hacia arriba por defecto */
-            transition: transform 0.25s ease-in; /* Animación de caída */
+            background-size: cover; background-position: center; 
+            z-index: 2; pointer-events: none; 
+            opacity: 0;
+            transition: opacity 0.2s ease-in; 
         }
 
-        /* HITBOX CON BORDE ROJO VISIBLE PARA QUE LA VEAS SÍ O SÍ */
+        /* HITBOX AJUSTADA EXACTAMENTE AL BOTÓN ROJO DE TU IMAGEN */
         #door-hitbox { 
             position: absolute; 
-            top: 35%; 
-            left: 20%; 
-            width: 25%; 
-            height: 35%; 
+            top: 43%; 
+            left: 55%; 
+            width: 22%; 
+            height: 30%; 
             cursor: pointer; 
             display: none; 
-            z-index: 99; /* Súper arriba para que nada la tape */
-            background: rgba(255, 0, 0, 0.4); /* Rojo semitransparente visible */
-            border: 3px solid yellow; /* Borde amarillo para destacarla */
+            z-index: 99; 
+            background: transparent; /* Invisible ya que encontraste el sitio perfecto */
+            border: none; 
         }
 
         /* CAPA DE OSCURIDAD */
@@ -196,18 +196,16 @@
         }
         update();
 
-        // ANIMACIÓN DE LA PUERTA (Habitación 7)
+        // ANIMACIÓN DE LA PUERTA (Habitación 7) - Usa directamente las imágenes de fondo para evitar superposiciones raras
         function toggleDoor() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData && wallData.hasDoor) {
                 isDoorClosed = !isDoorClosed;
                 if (isDoorClosed) {
                     office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
-                    doorOverlay.style.transform = 'translateY(0%)'; // Desliza la puerta hacia abajo
                     btnForward.style.display = 'none'; // Impide avanzar mientras esté cerrada
                 } else {
                     office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png')`;
-                    doorOverlay.style.transform = 'translateY(-100%)'; // Sube y oculta la puerta
                     btnForward.style.display = wallData.link !== null ? 'flex' : 'none'; // Reactiva el botón
                 }
             }
@@ -323,7 +321,6 @@
             
             // Resetea la puerta si cambiamos de vista/habitación
             isDoorClosed = false;
-            doorOverlay.style.transform = 'translateY(-100%)'; 
 
             office.style.backgroundImage = `url('${wallData.img}')`;
             
