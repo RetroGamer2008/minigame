@@ -15,27 +15,27 @@
         /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO FIJO PARA EL ZOOM */
         #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
-        /* CAPA DE LA PUERTA (MANTENIDA POR ESTRUCTURA) */
+        /* CAPA DE LA PUERTA (DOOR.png) CON ANIMACIÓN DE DESLIZAMIENTO */
         #door-overlay { 
             position: absolute; top: 0; left: 30%; width: 40%; height: 100%; 
-            background-size: cover; background-position: center; 
-            z-index: 2; pointer-events: none; 
-            opacity: 0;
-            transition: opacity 0.2s ease-in; 
+            background-image: url('DOOR.png'); background-size: cover; background-position: center; 
+            z-index: 5; pointer-events: none; 
+            transform: translateY(-100%); /* Oculta hacia arriba por defecto */
+            transition: transform 0.25s ease-in; /* Animación de caída */
         }
 
-        /* HITBOX CORREGIDA: Sobre el botón derecho, acortada y sin estirarse en diagonal */
+        /* HITBOX CON BORDE ROJO VISIBLE PARA QUE LA VEAS SÍ O SÍ */
         #door-hitbox { 
             position: absolute; 
-            top: 43%; 
-            left: 55%; 
-            width: 22%; 
-            height: 30%; 
+            top: 35%; 
+            left: 20%; 
+            width: 25%; 
+            height: 35%; 
             cursor: pointer; 
             display: none; 
-            z-index: 99; 
-            background: rgba(255, 0, 0, 0.4); /* Rojo visible para ubicarla */
-            border: 3px solid yellow; /* Borde amarillo de guía */
+            z-index: 99; /* Súper arriba para que nada la tape */
+            background: rgba(255, 0, 0, 0.4); /* Rojo semitransparente visible */
+            border: 3px solid yellow; /* Borde amarillo para destacarla */
         }
 
         /* CAPA DE OSCURIDAD */
@@ -203,9 +203,11 @@
                 isDoorClosed = !isDoorClosed;
                 if (isDoorClosed) {
                     office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
+                    doorOverlay.style.transform = 'translateY(0%)'; // Desliza la puerta hacia abajo
                     btnForward.style.display = 'none'; // Impide avanzar mientras esté cerrada
                 } else {
                     office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png')`;
+                    doorOverlay.style.transform = 'translateY(-100%)'; // Sube y oculta la puerta
                     btnForward.style.display = wallData.link !== null ? 'flex' : 'none'; // Reactiva el botón
                 }
             }
@@ -218,9 +220,8 @@
         const img3Caminos = 'Habitacion_3_caminos.png';
         const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.png';
         
-        // Imágenes para Habitación 7
+        // Imágenes nuevas para Habitación 7
         const imgPuertaConPuertaOFF = 'Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png';
-        const imgPuertaConPuertaON = 'Habitacion_Cuarto_1 puerta abierta_con_puertaON.png';
         const imgMesa1 = 'Habitacion con mesa 1.png';
 
         // --- MAPA ---
@@ -322,6 +323,7 @@
             
             // Resetea la puerta si cambiamos de vista/habitación
             isDoorClosed = false;
+            doorOverlay.style.transform = 'translateY(-100%)'; 
 
             office.style.backgroundImage = `url('${wallData.img}')`;
             
