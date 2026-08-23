@@ -27,11 +27,11 @@
         #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-size: cover; background-position: center; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.2s ease-in; }
         #door-hitbox { position: absolute; top: 51%; left: 39%; width: 4.5%; height: 13.5%; cursor: pointer; display: none; z-index: 99; background: transparent; border: none; }
 
-        /* EFECTO POLVO AMBIENTAL (Ahora dentro del escenario con transform-style) */
+        /* EFECTO POLVO AMBIENTAL */
         #dust-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3; pointer-events: none; opacity: 0.6; }
 
-        /* MONSTRUO 001_jar (Ahora posicionado estáticamente dentro del escenario para moverse junto a la oficina) */
-        #monster-container { position: absolute; top: 38%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; }
+        /* MONSTRUO 001_jar (Transición suave para simular el deslizamiento tipo FNaC 3) */
+        #monster-container { position: absolute; top: 38%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
         .monster-sprite { width: 120px; height: 120px; background-color: red; box-shadow: 0 0 20px darkred; border: 3px solid black; }
         /* Animación de temblor cuando es alumbrado */
         .tremble { animation: shake 0.1s infinite; }
@@ -47,8 +47,9 @@
         #shader-lens { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; box-shadow: inset 0 0 120px rgba(0,0,0,1); background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; }
         #transition-overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: black; z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-in-out; }
 
-        /* DEBUG PANEL */
-        #debug-panel { position: absolute; top: 10px; right: 260px; background: rgba(0,0,0,0.8); border: 1px solid #0f0; color: #0f0; padding: 10px; z-index: 9999; font-size: 12px; pointer-events: none; }
+        /* PANELERÍA DEBUG */
+        #debug-panel { position: absolute; top: 10px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #0f0; color: #0f0; padding: 10px; z-index: 9999; font-size: 12px; pointer-events: none; width: 220px; }
+        #debug-hitbox-panel { position: absolute; top: 180px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #ff0; color: #ff0; padding: 10px; z-index: 9999; font-size: 11px; pointer-events: none; width: 220px; }
 
         /* INTERFAZ DE USUARIO (UI) */
         #ui-layer { position: absolute; bottom: 30px; right: 40px; z-index: 50; display: flex; align-items: center; gap: 15px; opacity: 0.8; }
@@ -91,26 +92,34 @@
         <button id="btn-start">EMPEZAR</button>
     </div>
 
-    <!-- PANEL DEBUG -->
+    <!-- PANEL DEBUG PRINCIPAL -->
     <div id="debug-panel">
-        <b>[ SISTEMA DEV ]</b><br>
+        <b>[ 001.jar STATS ]</b><br>
         Tirada Puerta: <span id="dbg-roll">N/A</span><br>
-        Monstruo: <span id="dbg-status">Inactivo</span><br>
+        Estado: <span id="dbg-status">Inactivo</span><br>
         Fase: <span id="dbg-phase">0</span><br>
         Stun: <span id="dbg-stun">0.0</span>s<br>
         Cooldown: <span id="dbg-cd">0</span>s<br>
         Iluminado: <span id="dbg-light">NO</span>
     </div>
 
+    <!-- NUEVO PANEL DEBUG PARA HITBOX -->
+    <div id="debug-hitbox-panel">
+        <b>[ HITBOX MONITOR ]</b><br>
+        X (Left): <span id="dbg-hx">0</span>px<br>
+        Y (Top): <span id="dbg-hy">0</span>px<br>
+        Distancia Luz: <span id="dbg-hdist">0</span>px
+    </div>
+
     <!-- JUEGO PRINCIPAL -->
     <div id="game-container">
-        <!-- EL ESCENARIO QUE CONTIENE TODO LO DEL ENTORNO -->
+        <!-- ESCENARIO PRINCIPAL -->
         <div id="office">
             <div id="door-overlay"></div>
             <div id="door-hitbox" onclick="toggleDoor()"></div>
-            <!-- CANVAS PARA POLVO (Ahora parte del escenario) -->
             <canvas id="dust-canvas"></canvas>
-            <!-- MONSTRUO 001_jar (Ahora dentro del escenario para moverse junto a la oficina) -->
+            
+            <!-- MONSTRUO 001_jar -->
             <div id="monster-container">
                 <div id="monster-sprite" class="monster-sprite"></div>
             </div>
@@ -157,17 +166,18 @@
         const batteryFill = document.getElementById('battery-fill'), doorHitbox = document.getElementById('door-hitbox'), btnForward = document.getElementById('btn-forward');
         const doorTimerContainer = document.getElementById('door-timer-container'), doorTimerFill = document.getElementById('door-timer-fill');
         
-        // Referencias Monstruo y Stun
         const monsterContainer = document.getElementById('monster-container');
         const monsterSprite = document.getElementById('monster-sprite');
         const stunTimerContainer = document.getElementById('stun-timer-container');
         const stunTimerFill = document.getElementById('stun-timer-fill');
         
-        // Referencias Debug
         const dbgRoll = document.getElementById('dbg-roll'), dbgStatus = document.getElementById('dbg-status');
         const dbgPhase = document.getElementById('dbg-phase'), dbgStun = document.getElementById('dbg-stun'), dbgCd = document.getElementById('dbg-cd'), dbgLight = document.getElementById('dbg-light');
+        
+        // Referencias del nuevo panel de Hitbox
+        const dbgHx = document.getElementById('dbg-hx'), dbgHy = document.getElementById('dbg-hy'), dbgHdist = document.getElementById('dbg-hdist');
 
-        // --- SISTEMA DE POLVO (CANVAS) ---
+        // --- SISTEMA DE POLVO ---
         const dustCanvas = document.getElementById('dust-canvas');
         const dustCtx = dustCanvas.getContext('2d');
         let particles = [];
@@ -200,7 +210,7 @@
             });
         }
 
-        // --- SISTEMA DE MINIMAPA Y CANVAS ---
+        // --- MINIMAPA ---
         const mapCanvas = document.getElementById('minimap-canvas'), mapCtx = mapCanvas.getContext('2d');
         const discoveredRooms = new Set(['habitacion_1']); 
         const mapCellSize = 35, mapCanvasCenterX = mapCanvas.width / 2, mapCanvasCenterY = mapCanvas.height / 2;
@@ -211,11 +221,12 @@
         
         let isDoorClosed = false, doorInterval = null, doorTimeRemaining = 0, maxDoorTime = 120; 
 
-        // --- VARIABLES DEL MONSTRUO 001_jar ---
+        // --- VARIABLES DEL MONSTRUO ---
         let isMonsterActive = false;
         let monsterPhase = 0;
         let monsterStunTime = 0;
-        let monsterCooldown = 0; // Cooldown de 100s en Habitación 7
+        let monsterCooldown = 0;
+        let monsterEvadeTimer = 0;
 
         btnStart.addEventListener('click', () => {
             warningScreen.style.display = 'none'; gameContainer.style.display = 'block'; gameStarted = true;
@@ -250,35 +261,50 @@
             flashlightLayer.style.opacity = isFlashlightOn ? '1' : '0';
         }
 
-        // --- LÓGICA DEL MONSTRUO 001.jar ---
+        // --- LÓGICA DEL MONSTRUO ---
         function triggerMonster() {
             isMonsterActive = true;
             monsterPhase = 1;
             monsterStunTime = 20.0;
+            monsterEvadeTimer = 0;
             
             monsterContainer.style.display = 'block';
-            // Aparece inicialmente arriba en el centro de la escena
-            monsterContainer.style.left = '50%';
+            monsterContainer.style.left = '50%'; // Centro inicial parte superior
             
             stunTimerContainer.style.display = 'block';
-            dbgStatus.innerText = 'Atacando';
+            dbgStatus.innerText = 'Atacando (Fase 1)';
         }
 
         function updateMonsterLogic() {
             if (!isMonsterActive) return;
 
-            // Detección exacta basada en coordenadas globales de pantalla
             let rect = monsterSprite.getBoundingClientRect();
             let centerX = rect.left + rect.width / 2;
             let centerY = rect.top + rect.height / 2;
             let distancia = Math.hypot(mouseX - centerX, mouseY - centerY);
-            let isIlluminated = (isFlashlightOn && distancia < 250);
+
+            // Actualizar datos en el nuevo panel de Hitbox
+            dbgHx.innerText = Math.round(centerX);
+            dbgHy.innerText = Math.round(centerY);
+            dbgHdist.innerText = Math.round(distancia);
+
+            let isIlluminated = (isFlashlightOn && distancia < 200);
             
             if (isIlluminated) {
                 monsterSprite.classList.add('tremble');
                 monsterStunTime -= 0.016; 
                 dbgLight.innerText = 'SÍ';
                 dbgLight.style.color = '#ff0000';
+
+                // CORRECCIÓN: Comportamiento de evasión estilo FNaC 3 (deslizarse para evitar la luz)
+                monsterEvadeTimer += 0.016;
+                if (monsterEvadeTimer > 0.8) { // Cada 0.8 segundos intentará buscar un nuevo carril para huir
+                    // Elige aleatoriamente desplazarse hacia la izquierda o derecha de la pantalla actual
+                    let evasionOffsets = ['25%', '40%', '60%', '75%'];
+                    let randomSpot = evasionOffsets[Math.floor(Math.random() * evasionOffsets.length)];
+                    monsterContainer.style.left = randomSpot;
+                    monsterEvadeTimer = 0;
+                }
             } else {
                 monsterSprite.classList.remove('tremble');
                 dbgLight.innerText = 'NO';
@@ -293,35 +319,33 @@
 
             if (monsterStunTime <= 0) {
                 if (monsterPhase === 1) {
-                    // Pasa a Fase 2: Aleatoriamente en el lado Este o Oeste de la habitación 7
                     monsterPhase = 2;
                     monsterStunTime = 20.0;
+                    monsterEvadeTimer = 0;
                     
-                    // Elegir aleatoriamente entre lado Este (ej. 75%) u Oeste (ej. 25%)
+                    // Ataque aleatorio secundario: Lado Este (ej. 75%) u Oeste (ej. 25%)
                     let randomSide = Math.random() < 0.5 ? '25%' : '75%';
                     monsterContainer.style.left = randomSide;
+                    dbgStatus.innerText = 'Atacando (Fase 2)';
                     
                 } else if (monsterPhase === 2) {
-                    // Derrotado por completo
                     isMonsterActive = false;
                     monsterContainer.style.display = 'none';
                     stunTimerContainer.style.display = 'none';
                     monsterSprite.classList.remove('tremble');
-                    dbgStatus.innerText = 'Derrotado (Cooldown act)';
+                    dbgStatus.innerText = 'Derrotado (Cooldown)';
                     
-                    // Activar Cooldown de 100 segundos si se encuentra en Habitación 7
                     if (currentRoom === 'habitacion_7') {
-                        monsterCooldown = 100;
+                        monsterCooldown = 100; // Cooldown de 100s en Habitación 7
                     }
                 }
             }
         }
 
-        // BUCLE PRINCIPAL DEL JUEGO
+        // BUCLE PRINCIPAL
         function update() {
             if (!gameStarted) return;
             time += 0.08; 
-            
             drawDust(); 
 
             if (!isMoving) {
@@ -337,19 +361,17 @@
             batteryFill.style.width = `${Math.floor(battery / 2) * 2}%`;
             batteryFill.style.backgroundColor = battery <= 20 ? '#ff0000' : battery <= 50 ? '#ffff00' : '#00ff00';
             
-            // Reducir Cooldown si está activo
             if (monsterCooldown > 0) {
-                monsterCooldown -= 0.016; // Aprox 1 segundo por cada ~60 frames
+                monsterCooldown -= 0.016; 
                 if (monsterCooldown < 0) monsterCooldown = 0;
             }
             dbgCd.innerText = Math.ceil(monsterCooldown);
 
             updateMonsterLogic(); 
-
             requestAnimationFrame(update);
         }
 
-        // LÓGICA DE PUERTAS Y DISPARADOR DEL MONSTRUO
+        // PUERTAS Y DISPARADOR
         function toggleDoor() {
             if (!gameStarted || isDoorClosed) return; 
             const wallData = mapa[currentRoom].paredes[currentFacing];
@@ -359,13 +381,12 @@
                 btnForward.style.display = 'none'; 
                 sfxOn.currentTime = 0; sfxOn.play(); 
                 
-                // --- DISPARADOR DE 001.jar con validación de Cooldown y Habitación 7 ---
                 let canAttack = true;
                 if (currentRoom === 'habitacion_7' && monsterCooldown > 0) {
-                    canAttack = false; // Está en cooldown
+                    canAttack = false; 
                 }
 
-                let chance = Math.floor(Math.random() * 3); // 0, 1, o 2
+                let chance = Math.floor(Math.random() * 3); 
                 dbgRoll.innerText = chance;
 
                 if (canAttack && chance === 2 && !isMonsterActive) {
