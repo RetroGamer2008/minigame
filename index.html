@@ -15,8 +15,14 @@
         /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO FIJO PARA EL ZOOM */
         #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
-        /* CAPA DE LA PUERTA (DOOR.png) */
-        #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-image: url('DOOR.png'); background-size: cover; background-position: center; display: none; z-index: 5; pointer-events: none; }
+        /* CAPA DE LA PUERTA (DOOR.png) CON ANIMACIÓN DE DESLIZAMIENTO */
+        #door-overlay { 
+            position: absolute; top: 0; left: 30%; width: 40%; height: 100%; 
+            background-image: url('DOOR.png'); background-size: cover; background-position: center; 
+            z-index: 5; pointer-events: none; 
+            transform: translateY(-100%); /* Oculta hacia arriba por defecto */
+            transition: transform 0.25s ease-in; /* Animación de caída */
+        }
 
         /* HITBOX EXACTO PARA EL BOTÓN YA DIBUJADO EN LA IMAGEN DE LA PUERTA */
         #door-hitbox { position: absolute; top: 48%; left: 47%; width: 6%; height: 8%; cursor: pointer; display: none; z-index: 8; background: transparent; }
@@ -109,6 +115,7 @@
         const batteryFill = document.getElementById('battery-fill');
         const doorOverlay = document.getElementById('door-overlay');
         const doorHitbox = document.getElementById('door-hitbox');
+        const btnForward = document.getElementById('btn-forward');
 
         let isFlashlightOn = false;
         let battery = 100;
@@ -178,27 +185,35 @@
         }
         update();
 
+        // ANIMACIÓN DE LA PUERTA (Habitación 7)
         function toggleDoor() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData && wallData.hasDoor) {
                 isDoorClosed = !isDoorClosed;
                 if (isDoorClosed) {
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaON.png')`;
-                    doorOverlay.style.display = 'block';
+                    office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
+                    doorOverlay.style.transform = 'translateY(0%)'; // Desliza la puerta hacia abajo
+                    btnForward.style.display = 'none'; // Impide avanzar mientras esté cerrada
                 } else {
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1_puerta_abierta_con_puertaOFF.png')`;
-                    doorOverlay.style.display = 'none';
+                    office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png')`;
+                    doorOverlay.style.transform = 'translateY(-100%)'; // Sube y oculta la puerta
+                    btnForward.style.display = wallData.link !== null ? 'flex' : 'none'; // Reactiva el botón
                 }
             }
         }
 
-        // --- ASIGNACIÓN EXACTA DE TUS IMÁGENES POR HABITACIÓN Y PARED ---
+        // --- IMÁGENES BASE ---
         const imgPuertaSinPuerta = 'Habitacion_Cuarto_1 puerta abierta sin puerta.png';
         const imgCuartoCerrado = 'Habitacion_Cuarto_cerrado.png';
         const img2CaminosIzq = 'Habitacion_2_caminos_segundocamino_izquierda.png';
         const img3Caminos = 'Habitacion_3_caminos.png';
         const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.png';
+        
+        // Imágenes nuevas para Habitación 7
+        const imgPuertaConPuertaOFF = 'Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png';
+        const imgMesa1 = 'Habitacion con mesa 1.png';
 
+        // --- MAPA ---
         const mapa = {
             'habitacion_1': { 
                 x: 110, y: 185, type: 'room', 
@@ -231,7 +246,7 @@
                 x: 110, y: 125, type: 'room', 
                 paredes: [
                     { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
-                    { dir: 1, img: img2CaminosDer, link: null, hasDoor: false },             // Este
+                    { dir: 1, img: img2CaminosDer, link: null, hasDoor: false },               // Este
                     { dir: 2, img: img3Caminos, link: 'habitacion_3', hasDoor: false },        // Sur
                     { dir: 3, img: img2CaminosIzq, link: 'habitacion_5', hasDoor: false }      // Oeste
                 ] 
@@ -249,9 +264,18 @@
                 x: 70, y: 125, type: 'room', 
                 paredes: [
                     { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
-                    { dir: 1, img: img2CaminosIzq, link: 'habitacion_5', hasDoor: false },     // Este
-                    { dir: 2, img: img3Caminos, link: null, hasDoor: false },                  // Sur
-                    { dir: 3, img: img2CaminosDer, link: null, hasDoor: false }                // Oeste
+                    { dir: 1, img: img2CaminosDer, link: 'habitacion_5', hasDoor: false },     // Este
+                    { dir: 2, img: img3Caminos, link: 'habitacion_7', hasDoor: false },        // Sur -> Hacia la 7
+                    { dir: 3, img: img2CaminosIzq, link: null, hasDoor: false }                // Oeste
+                ] 
+            },
+            'habitacion_7': { 
+                x: 70, y: 145, type: 'room', // Posicionada al Sur de la 6
+                paredes: [
+                    { dir: 0, img: imgPuertaConPuertaOFF, link: 'habitacion_6', hasDoor: true }, // Norte (BOTÓN ACTIVO)
+                    { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false },               // Este
+                    { dir: 2, img: imgMesa1, link: null, hasDoor: false },                       // Sur
+                    { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }                // Oeste
                 ] 
             }
         };
@@ -262,7 +286,6 @@
 
         const btnLeft = document.getElementById('btn-left');
         const btnRight = document.getElementById('btn-right');
-        const btnForward = document.getElementById('btn-forward');
         const transitionOverlay = document.getElementById('transition-overlay');
         const playerArrow = document.getElementById('player-arrow');
 
@@ -287,8 +310,9 @@
         function updateView() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
             
+            // Resetea la puerta si cambiamos de vista/habitación
             isDoorClosed = false;
-            doorOverlay.style.display = 'none';
+            doorOverlay.style.transform = 'translateY(-100%)'; 
 
             office.style.backgroundImage = `url('${wallData.img}')`;
             
@@ -325,7 +349,7 @@
         });
 
         btnForward.addEventListener('click', () => {
-            if (isMoving) return;
+            if (isMoving || isDoorClosed) return; // No avanza si la puerta está abajo
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData.link !== null) {
                 isMoving = true;
