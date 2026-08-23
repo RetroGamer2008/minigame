@@ -162,9 +162,15 @@
                 office.style.transform = `translate3d(${currentPanX + Math.sin(time * 0.6) * 10}px, ${Math.cos(time * 0.8) * 6}px, 0) scale(1.25) rotateY(${((currentPanX / maxPan) - 0.5) * 18}deg)`;
             }
 
-            // GESTIÓN DE BATERÍA DE LA LINTERNA
-            if (isFlashlightOn) { battery -= 0.35; if (battery <= 0) { battery = 0; isFlashlightOn = false; sfxBroken.play(); actualizarLuces(); } }
-            else if (battery < 100) { battery += 0.15; if (battery > 100) battery = 100; }
+            // GESTIÓN DE BATERÍA DE LA LINTERNA (¡REDUCIDO PARA QUE DURE MÁS!)
+            if (isFlashlightOn) { 
+                battery -= 0.12; // Antes era 0.35
+                if (battery <= 0) { battery = 0; isFlashlightOn = false; sfxBroken.play(); actualizarLuces(); } 
+            }
+            else if (battery < 100) { 
+                battery += 0.15; 
+                if (battery > 100) battery = 100; 
+            }
             batteryFill.style.width = `${Math.floor(battery / 2) * 2}%`;
             batteryFill.style.backgroundColor = battery <= 20 ? '#ff0000' : battery <= 50 ? '#ffff00' : '#00ff00';
 
@@ -186,14 +192,14 @@
             }
         }
 
-        // --- IMÁGENES BASE CORREGIDAS A .PNG Y CON SUS ESPACIOS ---
+        // --- IMÁGENES BASE ---
         const imgPuertaSinPuerta = 'Habitacion_Cuarto_1 puerta abierta sin puerta.png';
         const imgCuartoCerrado = 'Habitacion_Cuarto_cerrado.png';
         const img2CaminosIzq = 'Habitacion_2_caminos_segundocamino_izquierda.png';
         const img3Caminos = 'Habitacion_3_caminos.png';
         const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.png';
 
-        // --- MAPA (Primeras 4 Habitaciones) ---
+        // --- MAPA (Habitaciones 1 a la 6) ---
         const mapa = {
             'habitacion_1': { 
                 x: 110, y: 185, type: 'room', 
@@ -226,9 +232,27 @@
                 x: 110, y: 125, type: 'room', 
                 paredes: [
                     { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
-                    { dir: 1, img: img2CaminosIzq, link: null, hasDoor: false },               // Este (Sin link aún)
-                    { dir: 2, img: img3Caminos, link: 'habitacion_3', hasDoor: false },        // Sur (Regreso)
-                    { dir: 3, img: img2CaminosDer, link: null, hasDoor: false }                // Oeste (Sin link aún)
+                    { dir: 1, img: img2CaminosDer, link: 'habitacion_5', hasDoor: false },     // Este (Va a Hab 5)
+                    { dir: 2, img: img3Caminos, link: 'habitacion_3', hasDoor: false },        // Sur (Regreso a 3)
+                    { dir: 3, img: img2CaminosIzq, link: 'habitacion_6', hasDoor: false }      // Oeste (Va a Hab 6)
+                ] 
+            },
+            'habitacion_5': { 
+                x: 140, y: 125, type: 'room', // Se dibuja a la derecha en el minimapa
+                paredes: [
+                    { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
+                    { dir: 1, img: imgPuertaSinPuerta, link: null, hasDoor: false },           // Este (Aún sin link)
+                    { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false },             // Sur
+                    { dir: 3, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }  // Oeste (Regreso a 4)
+                ] 
+            },
+            'habitacion_6': { 
+                x: 80, y: 125, type: 'room', // Se dibuja a la izquierda en el minimapa
+                paredes: [
+                    { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
+                    { dir: 1, img: img2CaminosIzq, link: 'habitacion_4', hasDoor: false },     // Este (Regreso a 4)
+                    { dir: 2, img: img3Caminos, link: null, hasDoor: false },                  // Sur (Aún sin link)
+                    { dir: 3, img: img2CaminosDer, link: null, hasDoor: false }                // Oeste (Aún sin link)
                 ] 
             }
         };
