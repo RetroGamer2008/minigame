@@ -12,8 +12,8 @@
         /* CONTENEDOR PRINCIPAL */
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; }
 
-        /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO FIJO PARA EL ZOOM */
-        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease, background-size 0.3s ease, background-position 0.3s ease; }
+        /* IMAGEN DE LA OFICINA / HABITACIÓN - RESTAURADO A ORIGINAL */
+        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
         /* CAPA DE LA PUERTA (MANTENIDA POR ESTRUCTURA) */
         #door-overlay { 
@@ -24,7 +24,7 @@
             transition: opacity 0.2s ease-in; 
         }
 
-        /* HITBOX ORIGINAL RESTAURADA - Sin modificar */
+        /* HITBOX ORIGINAL - INTACTA */
         #door-hitbox { 
             position: absolute; 
             top: 43%; 
@@ -58,7 +58,7 @@
         
         #instructions { position: absolute; top: 20px; right: 20px; z-index: 50; font-size: 1.2rem; text-shadow: 2px 2px 0 #000; opacity: 0.7; }
 
-        /* BARRA DE TEMPORIZADOR DE LA PUERTA */
+        /* TEMPORIZADOR DE LA PUERTA (HUD) */
         #door-timer-container {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
             width: 300px; height: 25px; border: 2px solid #fff; padding: 2px;
@@ -74,7 +74,7 @@
             border: 2px solid #444; z-index: 50; background-color: rgba(0, 0, 0, 0.9); 
         }
 
-        /* FLECHA DEL JUGADOR CON CÍRCULO */
+        /* FLECHA DEL JUGADOR */
         #player-arrow { 
             position: absolute; width: 10px; height: 10px; background-color: white; border-radius: 50%; 
             transition: left 0.8s, top 0.8s, transform 0.2s ease; transform-origin: center; z-index: 55; box-shadow: 0 0 4px white; 
@@ -107,7 +107,7 @@
         <!-- INTERFAZ Y HUD -->
         <div id="instructions">Presiona 'F' para usar la linterna</div>
         
-        <!-- HUD: TEMPORIZADOR DE LA PUERTA -->
+        <!-- HUD: TEMPORIZADOR -->
         <div id="door-timer-container">
             <div id="door-timer-fill"></div>
             <div id="door-timer-text">Cerrada</div>
@@ -159,7 +159,7 @@
         let isDoorClosed = false;
         let doorInterval = null;
         let doorTimeRemaining = 0;
-        const maxDoorTime = 240; 
+        const maxDoorTime = 240; // 4 minutos
 
         // RASTREO DEL RATÓN Y PARALLAX 3D
         window.addEventListener('mousemove', (e) => {
@@ -225,11 +225,13 @@
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData && wallData.hasDoor) {
                 if (!isDoorClosed) {
+                    // CERRAR PUERTA
                     isDoorClosed = true;
                     office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
                     btnForward.style.display = 'none'; 
                     sfxOn.currentTime = 0; sfxOn.play(); 
                     
+                    // Iniciar Temporizador
                     doorTimeRemaining = maxDoorTime;
                     doorTimerContainer.style.display = 'block';
                     doorTimerFill.style.width = '100%';
@@ -250,6 +252,7 @@
                     }, 1000); 
                     
                 } else {
+                    // ABRIR PUERTA MANUALMENTE
                     abrirPuerta();
                     sfxOff.currentTime = 0; sfxOff.play(); 
                 }
@@ -261,6 +264,7 @@
             if(doorInterval) clearInterval(doorInterval);
             doorTimerContainer.style.display = 'none';
 
+            // Actualizar la imagen si seguimos viendo la pared
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData && wallData.hasDoor) {
                 office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png')`;
@@ -317,20 +321,12 @@
             playerArrow.style.transform = `rotate(${currentRotation}deg)`;
         }
 
+        // LÓGICA DE VISTA RESTAURADA
         function updateView() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
             
-            // --- NUEVO: RESTABLECER TAMAÑO POR DEFECTO EN PAREDES NORMALES ---
-            office.style.backgroundSize = 'cover';
-            office.style.backgroundPosition = 'center';
-
             if (wallData && wallData.hasDoor) {
                 doorHitbox.style.display = 'block';
-                
-                // --- NUEVO: AGRANDAR Y ACOMODAR LA IMAGEN DE LA PUERTA (Zoom al fondo) ---
-                office.style.backgroundSize = '130%'; /* Aumenta el zoom */
-                office.style.backgroundPosition = '40% 60%'; /* Ajusta la posición para centrarla */
-
                 if (isDoorClosed) {
                     office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
                     btnForward.style.display = 'none';
