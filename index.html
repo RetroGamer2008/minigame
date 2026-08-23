@@ -24,7 +24,7 @@
             transition: opacity 0.2s ease-in; 
         }
 
-        /* HITBOX DE LA PUERTA - VALORES EXACTOS APLICADOS */
+        /* HITBOX DE LA PUERTA - TUS VALORES EXACTOS */
         #door-hitbox { 
             position: absolute; 
             top: 51%; 
@@ -34,8 +34,8 @@
             cursor: pointer; 
             display: none; 
             z-index: 99; 
-            background: transparent; /* Cambia a rgba(255,0,0,0.4) si quieres volver a verla */
-            border: none;            /* Cambia a 3px solid yellow si quieres ver el borde */
+            background: transparent; 
+            border: none;            
         }
 
         /* CAPAS VISUALES (Oscuridad, Linterna, CRT) */
@@ -98,7 +98,7 @@
         
         <div id="door-timer-container">
             <div id="door-timer-fill"></div>
-            <div id="door-timer-text">Cerrada</div>
+            <div id="door-timer-text">Cerrada (Bloqueada)</div>
         </div>
         
         <div id="ui-layer">
@@ -147,7 +147,7 @@
         let isDoorClosed = false;
         let doorInterval = null;
         let doorTimeRemaining = 0;
-        const maxDoorTime = 240; 
+        const maxDoorTime = 120; // 2 minutos (120 segundos)
 
         // RASTREO DEL RATÓN Y PARALLAX 3D
         window.addEventListener('mousemove', (e) => {
@@ -211,44 +211,46 @@
         // ANIMACIÓN Y LÓGICA DE LA PUERTA
         function toggleDoor() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
-            if (wallData && wallData.hasDoor) {
-                if (!isDoorClosed) {
-                    isDoorClosed = true;
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
-                    btnForward.style.display = 'none'; 
-                    sfxOn.currentTime = 0; sfxOn.play(); 
-                    
-                    doorTimeRemaining = maxDoorTime;
-                    doorTimerContainer.style.display = 'block';
-                    doorTimerFill.style.width = '100%';
-                    doorTimerFill.style.backgroundColor = '#00aaff';
-                    
-                    if(doorInterval) clearInterval(doorInterval);
-                    
-                    doorInterval = setInterval(() => {
-                        doorTimeRemaining -= 1;
-                        let percentage = (doorTimeRemaining / maxDoorTime) * 100;
-                        doorTimerFill.style.width = `${percentage}%`;
-                        
-                        if(percentage <= 25) doorTimerFill.style.backgroundColor = '#ff0000';
+            
+            // Si la puerta ya está cerrada, IGNORAMOS el clic (no se puede volver a abrir manualmente)
+            if (isDoorClosed) return; 
 
-                        if (doorTimeRemaining <= 0) {
-                            abrirPuerta();
-                        }
-                    }, 1000); 
+            if (wallData && wallData.hasDoor) {
+                // CERRAR PUERTA
+                isDoorClosed = true;
+                office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
+                btnForward.style.display = 'none'; 
+                sfxOn.currentTime = 0; sfxOn.play(); 
+                
+                // Iniciar Temporizador de 2 minutos
+                doorTimeRemaining = maxDoorTime;
+                doorTimerContainer.style.display = 'block';
+                doorTimerFill.style.width = '100%';
+                doorTimerFill.style.backgroundColor = '#00aaff';
+                
+                if(doorInterval) clearInterval(doorInterval);
+                
+                doorInterval = setInterval(() => {
+                    doorTimeRemaining -= 1;
+                    let percentage = (doorTimeRemaining / maxDoorTime) * 100;
+                    doorTimerFill.style.width = `${percentage}%`;
                     
-                } else {
-                    abrirPuerta();
-                    sfxOff.currentTime = 0; sfxOff.play(); 
-                }
+                    if(percentage <= 25) doorTimerFill.style.backgroundColor = '#ff0000';
+
+                    if (doorTimeRemaining <= 0) {
+                        abrirPuertaAutomaticamente();
+                    }
+                }, 1000); 
             }
         }
 
-        function abrirPuerta() {
+        function abrirPuertaAutomaticamente() {
             isDoorClosed = false;
             if(doorInterval) clearInterval(doorInterval);
             doorTimerContainer.style.display = 'none';
+            sfxOff.currentTime = 0; sfxOff.play();
 
+            // Actualizar la imagen si seguimos viendo la pared de la puerta
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData && wallData.hasDoor) {
                 office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png')`;
