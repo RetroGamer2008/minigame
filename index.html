@@ -24,19 +24,18 @@
             transition: opacity 0.2s ease-in; 
         }
 
-        /* HITBOX DE LA PUERTA (El que vas a modificar) */
+        /* HITBOX DE LA PUERTA - VALORES EXACTOS APLICADOS */
         #door-hitbox { 
             position: absolute; 
-            top: 43%; 
-            left: 55%; 
-            width: 22%; 
-            height: 30%; 
+            top: 51%; 
+            left: 39%; 
+            width: 4.5%; 
+            height: 13.5%; 
             cursor: pointer; 
             display: none; 
             z-index: 99; 
-            /* Se deja visible el rojo para que sepas dónde está mientras configuras */
-            background: rgba(255, 0, 0, 0.4); 
-            border: 3px solid yellow; 
+            background: transparent; /* Cambia a rgba(255,0,0,0.4) si quieres volver a verla */
+            border: none;            /* Cambia a 3px solid yellow si quieres ver el borde */
         }
 
         /* CAPAS VISUALES (Oscuridad, Linterna, CRT) */
@@ -81,21 +80,6 @@
         #btn-left { top: 30%; left: 10px; width: 60px; height: 40%; }
         #btn-right { top: 30%; right: 10px; width: 60px; height: 40%; }
         #btn-forward { bottom: 20px; left: 50%; transform: translateX(-50%); width: 200px; height: 60px; display: none; }
-
-        /* --- NUEVO: ESTILOS DEL PANEL DE DEPURACIÓN (DEBUG) --- */
-        #debug-panel {
-            position: absolute; bottom: 20px; left: 20px; width: 250px;
-            background: rgba(0,0,0,0.85); border: 2px solid #00ff00; border-radius: 8px;
-            padding: 15px; z-index: 9999; color: #00ff00; font-family: monospace;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        #debug-panel h3 { margin: 0; text-align: center; font-size: 1.1rem; }
-        .debug-slider-group { display: flex; flex-direction: column; }
-        .debug-slider-group input { cursor: pointer; }
-        #debug-output { 
-            background: #111; color: #00ff00; border: 1px solid #00ff00; 
-            padding: 5px; font-family: monospace; resize: none; overflow: hidden;
-        }
     </style>
 </head>
 <body>
@@ -103,7 +87,6 @@
     <div id="game-container">
         <div id="office">
             <div id="door-overlay"></div>
-            <!-- HITBOX -->
             <div id="door-hitbox" onclick="toggleDoor()"></div>
         </div>
         <div id="darkness-layer"></div>
@@ -128,29 +111,6 @@
         <div id="btn-left" class="nav-btn">◄</div>
         <div id="btn-right" class="nav-btn">►</div>
         <div id="btn-forward" class="nav-btn">AVANZAR ▲</div>
-
-        <!-- --- NUEVO: PANEL DE DEPURACIÓN EN PANTALLA --- -->
-        <div id="debug-panel">
-            <h3>Ajustar Hitbox</h3>
-            <div class="debug-slider-group">
-                <label>Eje X (Left): <span id="val-left">55</span>%</label>
-                <input type="range" id="debug-left" min="0" max="100" value="55" step="0.5">
-            </div>
-            <div class="debug-slider-group">
-                <label>Eje Y (Top): <span id="val-top">43</span>%</label>
-                <input type="range" id="debug-top" min="0" max="100" value="43" step="0.5">
-            </div>
-            <div class="debug-slider-group">
-                <label>Ancho (Width): <span id="val-width">22</span>%</label>
-                <input type="range" id="debug-width" min="1" max="100" value="22" step="0.5">
-            </div>
-            <div class="debug-slider-group">
-                <label>Alto (Height): <span id="val-height">30</span>%</label>
-                <input type="range" id="debug-height" min="1" max="100" value="30" step="0.5">
-            </div>
-            <label>Copia esto en CSS (#door-hitbox):</label>
-            <textarea id="debug-output" rows="4" readonly></textarea>
-        </div>
     </div>
 
     <script>
@@ -414,36 +374,6 @@
 
         updateMinimapPosition(false); 
         updateView();
-
-        // --- NUEVO LÓGICA DEL PANEL DE DEPURACIÓN ---
-        const debugLeft = document.getElementById('debug-left');
-        const debugTop = document.getElementById('debug-top');
-        const debugWidth = document.getElementById('debug-width');
-        const debugHeight = document.getElementById('debug-height');
-        const debugOutput = document.getElementById('debug-output');
-        
-        function updateDebugHitbox() {
-            // Actualizar CSS en tiempo real
-            doorHitbox.style.left = debugLeft.value + '%';
-            doorHitbox.style.top = debugTop.value + '%';
-            doorHitbox.style.width = debugWidth.value + '%';
-            doorHitbox.style.height = debugHeight.value + '%';
-            
-            // Actualizar etiquetas visuales
-            document.getElementById('val-left').textContent = debugLeft.value;
-            document.getElementById('val-top').textContent = debugTop.value;
-            document.getElementById('val-width').textContent = debugWidth.value;
-            document.getElementById('val-height').textContent = debugHeight.value;
-
-            // Generar código para copiar
-            debugOutput.value = `top: ${debugTop.value}%;\nleft: ${debugLeft.value}%;\nwidth: ${debugWidth.value}%;\nheight: ${debugHeight.value}%;`;
-        }
-
-        // Escuchar los sliders
-        debugLeft.addEventListener('input', updateDebugHitbox);
-        debugTop.addEventListener('input', updateDebugHitbox);
-        debugWidth.addEventListener('input', updateDebugHitbox);
-        debugHeight.addEventListener('input', updateDebugHitbox);
     </script>
 </body>
 </html>
