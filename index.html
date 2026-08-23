@@ -15,7 +15,7 @@
         /* IMAGEN DE LA OFICINA / HABITACIÓN - CENTRADO FIJO PARA EL ZOOM */
         #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
-        /* CAPA DE LA PUERTA (OCULTA O MANEJADA POR FONDO, MANTENIDA POR ESTRUCTURA) */
+        /* CAPA DE LA PUERTA (MANTENIDA POR ESTRUCTURA) */
         #door-overlay { 
             position: absolute; top: 0; left: 30%; width: 40%; height: 100%; 
             background-size: cover; background-position: center; 
@@ -24,18 +24,18 @@
             transition: opacity 0.2s ease-in; 
         }
 
-        /* HITBOX AJUSTADA EXACTAMENTE AL BOTÓN ROJO DE TU IMAGEN */
+        /* HITBOX VISIBLE Y AJUSTADA (REGRESADA A SU POSICIÓN ANTERIOR PERO ACORTADA) */
         #door-hitbox { 
             position: absolute; 
-            top: 43%; 
-            left: 55%; 
-            width: 22%; 
-            height: 30%; 
+            top: 38%; 
+            left: 12%; 
+            width: 15%; 
+            height: 28%; 
             cursor: pointer; 
             display: none; 
             z-index: 99; 
-            background: transparent; /* Invisible ya que encontraste el sitio perfecto */
-            border: none; 
+            background: rgba(255, 0, 0, 0.4); /* Visible con rojo semitransparente */
+            border: 3px solid yellow; /* Borde amarillo para verla claramente */
         }
 
         /* CAPA DE OSCURIDAD */
@@ -196,7 +196,7 @@
         }
         update();
 
-        // ANIMACIÓN DE LA PUERTA (Habitación 7) - Usa directamente las imágenes de fondo para evitar superposiciones raras
+        // ANIMACIÓN DE LA PUERTA (Habitación 7)
         function toggleDoor() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData && wallData.hasDoor) {
