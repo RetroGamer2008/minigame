@@ -24,18 +24,18 @@
             transition: opacity 0.2s ease-in; 
         }
 
-        /* HITBOX VISIBLE Y AJUSTADA (REGRESADA A SU POSICIÓN ANTERIOR PERO ACORTADA) */
+        /* HITBOX CORREGIDA: Devuelta a la derecha sobre el botón, pero acortada y sin estirarse en diagonal */
         #door-hitbox { 
             position: absolute; 
-            top: 38%; 
-            left: 12%; 
-            width: 15%; 
-            height: 28%; 
+            top: 43%; 
+            left: 55%; 
+            width: 22%; 
+            height: 30%; 
             cursor: pointer; 
             display: none; 
             z-index: 99; 
-            background: rgba(255, 0, 0, 0.4); /* Visible con rojo semitransparente */
-            border: 3px solid yellow; /* Borde amarillo para verla claramente */
+            background: rgba(255, 0, 0, 0.4); /* Rojo visible para que confirmes que está en el botón */
+            border: 3px solid yellow; /* Borde amarillo de guía */
         }
 
         /* CAPA DE OSCURIDAD */
@@ -142,7 +142,7 @@
             if (isMoving) return;
             mouseX = e.clientX;
             flashlightLayer.style.setProperty('--x', `${mouseX}px`);
-            flashlightLayer.style.setProperty('--y', `${e.clientY}px`);
+            flashlightLayer.style.setProperty('--y`, `${e.clientY}px`);
 
             const screenWidth = window.innerWidth;
             const edgeThreshold = screenWidth * 0.35;
@@ -218,8 +218,9 @@
         const img3Caminos = 'Habitacion_3_caminos.png';
         const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.png';
         
-        // Imágenes nuevas para Habitación 7
+        // Imágenes restauradas para Habitación 7
         const imgPuertaConPuertaOFF = 'Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png';
+        const imgPuertaConPuertaON = 'Habitacion_Cuarto_1 puerta abierta_con_puertaON.png';
         const imgMesa1 = 'Habitacion con mesa 1.png';
 
         // --- MAPA ---
