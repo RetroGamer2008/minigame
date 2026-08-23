@@ -10,19 +10,11 @@
         body { background-color: #000; overflow: hidden; color: white; font-family: 'Courier New', Courier, monospace; }
 
         /* PANTALLA DE ADVERTENCIA */
-        #warning-screen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000;
-            z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; padding: 20px;
-        }
+        #warning-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         #warning-screen h1 { color: #ff0000; font-size: 3rem; margin-bottom: 20px; text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5); letter-spacing: 2px; }
         #warning-screen p { font-size: 1.2rem; line-height: 1.6; max-width: 600px; margin-bottom: 40px; color: #ccc; }
         #warning-screen b { color: #fff; }
-        #btn-start {
-            padding: 15px 40px; font-size: 1.5rem; font-family: 'Courier New', Courier, monospace;
-            background-color: transparent; color: #fff; border: 2px solid #fff; cursor: pointer;
-            transition: all 0.3s ease; text-transform: uppercase;
-        }
+        #btn-start { padding: 15px 40px; font-size: 1.5rem; font-family: 'Courier New', Courier, monospace; background-color: transparent; color: #fff; border: 2px solid #fff; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; }
         #btn-start:hover { background-color: #fff; color: #000; box-shadow: 0 0 15px #fff; }
 
         /* CONTENEDOR PRINCIPAL DEL JUEGO */
@@ -35,11 +27,28 @@
         #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-size: cover; background-position: center; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.2s ease-in; }
         #door-hitbox { position: absolute; top: 51%; left: 39%; width: 4.5%; height: 13.5%; cursor: pointer; display: none; z-index: 99; background: transparent; border: none; }
 
-        /* CAPAS VISUALES */
+        /* EFECTO POLVO AMBIENTAL */
+        #dust-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 4; pointer-events: none; opacity: 0.6; }
+
+        /* MONSTRUO 001_jar */
+        #monster-container { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); z-index: 5; display: none; transition: left 0.8s ease-out; /* Permite que se deslice suavemente al esquivar */ }
+        .monster-sprite { width: 150px; height: 150px; background-color: red; box-shadow: 0 0 20px darkred; border: 3px solid black; }
+        /* Animación de temblor cuando es alumbrado */
+        .tremble { animation: shake 0.1s infinite; }
+        @keyframes shake {
+            0% { transform: translate(2px, 2px) rotate(1deg); }
+            50% { transform: translate(-2px, -2px) rotate(-1deg); }
+            100% { transform: translate(2px, -2px) rotate(0deg); }
+        }
+
+        /* CAPAS VISUALES DE LUZ Y OSCURIDAD */
         #darkness-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.995); z-index: 10; pointer-events: none; }
         #flashlight-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 11; pointer-events: none; opacity: 0; background: radial-gradient(circle 350px at var(--x, 50%) var(--y, 50%), rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0.95) 80%, rgba(0, 0, 0, 1) 100%); }
         #shader-lens { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; box-shadow: inset 0 0 120px rgba(0,0,0,1); background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; }
         #transition-overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: black; z-index: 25; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-in-out; }
+
+        /* DEBUG PANEL */
+        #debug-panel { position: absolute; top: 10px; right: 260px; background: rgba(0,0,0,0.8); border: 1px solid #0f0; color: #0f0; padding: 10px; z-index: 9999; font-size: 12px; pointer-events: none; }
 
         /* INTERFAZ DE USUARIO (UI) */
         #ui-layer { position: absolute; bottom: 30px; right: 40px; z-index: 50; display: flex; align-items: center; gap: 15px; opacity: 0.8; }
@@ -48,27 +57,20 @@
         .battery-fill { width: 100%; height: 100%; background-color: #00ff00; }
         #instructions { position: absolute; top: 20px; right: 20px; z-index: 50; font-size: 1.2rem; text-shadow: 2px 2px 0 #000; opacity: 0.7; }
 
-        /* TEMPORIZADOR DE LA PUERTA (HUD) */
+        /* TEMPORIZADORES (HUD) */
         #door-timer-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 300px; height: 25px; border: 2px solid #fff; padding: 2px; background: rgba(0,0,0,0.5); display: none; z-index: 50; }
         #door-timer-fill { width: 100%; height: 100%; background-color: #00aaff; transition: width 1s linear, background-color 0.5s ease; }
         #door-timer-text { position: absolute; width: 100%; text-align: center; top: 2px; left: 0; font-size: 1rem; text-shadow: 1px 1px 0 #000; pointer-events: none; }
+        
+        #stun-timer-container { position: absolute; top: 55px; left: 50%; transform: translateX(-50%); width: 300px; height: 25px; border: 2px solid #ff4444; padding: 2px; background: rgba(0,0,0,0.5); display: none; z-index: 50; }
+        #stun-timer-fill { width: 100%; height: 100%; background-color: #ff4444; }
+        #stun-timer-text { position: absolute; width: 100%; text-align: center; top: 2px; left: 0; font-size: 1rem; text-shadow: 1px 1px 0 #000; pointer-events: none; }
 
-        /* MINIMAPA NUEVO (CANVAS + CAMARA FIJA) */
-        #minimap-container { 
-            position: absolute; top: 20px; left: 20px; width: 220px; height: 220px; 
-            border: 2px solid #444; z-index: 50; background-color: rgba(0, 0, 0, 0.9); 
-            overflow: hidden; /* Oculta lo que sale del borde */
-        }
-        #minimap-canvas {
-            position: absolute; top: 0; left: 0;
-            transition: transform 0.8s ease; /* Transición para que la cámara se mueva suave */
-        }
-        #player-arrow { 
-            position: absolute; width: 10px; height: 10px; background-color: white; border-radius: 50%; 
-            top: 50%; left: 50%; margin-top: -5px; margin-left: -5px; /* Siempre en el centro */
-            transition: transform 0.2s ease; transform-origin: center; z-index: 55; box-shadow: 0 0 4px white; 
-        }
-        #player-arrow::after { content: ''; position: absolute; top: -8px; left: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid red; }
+        /* MINIMAPA (12 FPS RETRO) */
+        #minimap-container { position: absolute; top: 20px; left: 20px; width: 220px; height: 220px; border: 2px solid #444; z-index: 50; background-color: rgba(0, 0, 0, 0.9); overflow: hidden; }
+        #minimap-canvas { position: absolute; top: 0; left: 0; transition: transform 0.8s steps(10, end); }
+        #player-arrow { position: absolute; width: 10px; height: 10px; background-color: white; border-radius: 50%; top: 50%; left: 50%; margin-top: -3px; margin-left: -5px; transition: transform 0.2s steps(3, end); transform-origin: center; z-index: 55; box-shadow: 0 0 4px white; }
+        #player-arrow::after { content: ''; position: absolute; top: -8px; left: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid white; }
 
         /* BOTONES DE NAVEGACIÓN */
         .nav-btn { position: absolute; z-index: 40; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.5); font-size: 2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; }
@@ -89,20 +91,43 @@
         <button id="btn-start">EMPEZAR</button>
     </div>
 
+    <!-- PANEL DEBUG -->
+    <div id="debug-panel">
+        <b>[ SISTEMA DEV ]</b><br>
+        Tirada Puerta: <span id="dbg-roll">N/A</span><br>
+        Monstruo: <span id="dbg-status">Inactivo</span><br>
+        Fase: <span id="dbg-phase">0</span><br>
+        Stun: <span id="dbg-stun">0.0</span>s<br>
+        Iluminado: <span id="dbg-light">NO</span>
+    </div>
+
     <!-- JUEGO PRINCIPAL -->
     <div id="game-container">
         <div id="office">
             <div id="door-overlay"></div>
             <div id="door-hitbox" onclick="toggleDoor()"></div>
         </div>
+        
+        <!-- CANVAS PARA POLVO -->
+        <canvas id="dust-canvas"></canvas>
+
+        <!-- MONSTRUO 001_jar -->
+        <div id="monster-container">
+            <div id="monster-sprite" class="monster-sprite"></div>
+        </div>
+
         <div id="darkness-layer"></div>
         <div id="flashlight-layer"></div>
         <div id="shader-lens"></div>
         <div id="transition-overlay"></div>
 
         <div id="instructions">Presiona 'F' para usar la linterna</div>
+        
         <div id="door-timer-container"><div id="door-timer-fill"></div><div id="door-timer-text">Cerrada (Bloqueada)</div></div>
         
+        <!-- BARRA DE STUN DEL MONSTRUO -->
+        <div id="stun-timer-container"><div id="stun-timer-fill" id="stun-fill"></div><div id="stun-timer-text">Aturde a 001.jar</div></div>
+
         <div id="ui-layer">
             <img class="battery-icon" src="https://cdn.icon-icons.com/icons2/2406/PNG/512/battery_full_solid_icon_146059.png" alt="Bateria">
             <div class="battery-bar-container"><div class="battery-fill" id="battery-fill"></div></div>
@@ -127,50 +152,82 @@
         sfxOn.volume = 0.6; sfxOff.volume = 0.6; sfxBroken.volume = 0.5; sfxStep.volume = 0.7;
 
         // --- REFERENCIAS DOM ---
-        const warningScreen = document.getElementById('warning-screen');
-        const gameContainer = document.getElementById('game-container');
-        const btnStart = document.getElementById('btn-start');
-        const office = document.getElementById('office');
-        const darknessLayer = document.getElementById('darkness-layer');
-        const flashlightLayer = document.getElementById('flashlight-layer');
-        const batteryFill = document.getElementById('battery-fill');
-        const doorHitbox = document.getElementById('door-hitbox');
-        const btnForward = document.getElementById('btn-forward');
-        const doorTimerContainer = document.getElementById('door-timer-container');
-        const doorTimerFill = document.getElementById('door-timer-fill');
+        const warningScreen = document.getElementById('warning-screen'), gameContainer = document.getElementById('game-container'), btnStart = document.getElementById('btn-start');
+        const office = document.getElementById('office'), darknessLayer = document.getElementById('darkness-layer'), flashlightLayer = document.getElementById('flashlight-layer');
+        const batteryFill = document.getElementById('battery-fill'), doorHitbox = document.getElementById('door-hitbox'), btnForward = document.getElementById('btn-forward');
+        const doorTimerContainer = document.getElementById('door-timer-container'), doorTimerFill = document.getElementById('door-timer-fill');
+        
+        // Referencias Monstruo y Stun
+        const monsterContainer = document.getElementById('monster-container');
+        const monsterSprite = document.getElementById('monster-sprite');
+        const stunTimerContainer = document.getElementById('stun-timer-container');
+        const stunTimerFill = document.getElementById('stun-timer-fill');
+        
+        // Referencias Debug
+        const dbgRoll = document.getElementById('dbg-roll'), dbgStatus = document.getElementById('dbg-status');
+        const dbgPhase = document.getElementById('dbg-phase'), dbgStun = document.getElementById('dbg-stun'), dbgLight = document.getElementById('dbg-light');
+
+        // --- SISTEMA DE POLVO (CANVAS) ---
+        const dustCanvas = document.getElementById('dust-canvas');
+        const dustCtx = dustCanvas.getContext('2d');
+        let particles = [];
+        
+        function initDust() {
+            dustCanvas.width = window.innerWidth;
+            dustCanvas.height = window.innerHeight;
+            for(let i = 0; i < 40; i++) { // 40 partículas
+                particles.push({
+                    x: Math.random() * dustCanvas.width,
+                    y: Math.random() * dustCanvas.height,
+                    size: Math.random() * 2 + 1,
+                    speedX: (Math.random() - 0.5) * 0.4,
+                    speedY: (Math.random() - 1) * 0.6 // Suben lentamente
+                });
+            }
+        }
+
+        function drawDust() {
+            dustCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+            dustCtx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            particles.forEach(p => {
+                p.x += p.speedX; p.y += p.speedY;
+                if (p.y < 0) p.y = dustCanvas.height; // Si sale por arriba, aparece abajo
+                if (p.x < 0) p.x = dustCanvas.width;
+                if (p.x > dustCanvas.width) p.x = 0;
+                dustCtx.beginPath();
+                dustCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                dustCtx.fill();
+            });
+        }
 
         // --- SISTEMA DE MINIMAPA Y CANVAS ---
-        const canvas = document.getElementById('minimap-canvas');
-        const ctx = canvas.getContext('2d');
-        const discoveredRooms = new Set(['habitacion_1']); // Niebla de guerra
-        const mapCellSize = 35; // Tamaño de cada cuadrito en píxeles
-        const canvasCenterX = canvas.width / 2;
-        const canvasCenterY = canvas.height / 2;
+        const mapCanvas = document.getElementById('minimap-canvas'), mapCtx = mapCanvas.getContext('2d');
+        const discoveredRooms = new Set(['habitacion_1']); 
+        const mapCellSize = 35, mapCanvasCenterX = mapCanvas.width / 2, mapCanvasCenterY = mapCanvas.height / 2;
 
-        let isFlashlightOn = false;
-        let battery = 100;
-        let mouseX = window.innerWidth / 2;
+        let isFlashlightOn = false, battery = 100, mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let panSpeed = 0, currentPanX = 0, time = 0; 
         let isMoving = false, gameStarted = false; 
         
-        let isDoorClosed = false;
-        let doorInterval = null;
-        let doorTimeRemaining = 0;
-        const maxDoorTime = 120; // 2 minutos
+        let isDoorClosed = false, doorInterval = null, doorTimeRemaining = 0, maxDoorTime = 120; 
+
+        // --- VARIABLES DEL MONSTRUO 001_jar ---
+        let isMonsterActive = false;
+        let monsterPhase = 0;
+        let monsterStunTime = 0;
+        let monsterEvadeTimer = 0;
 
         btnStart.addEventListener('click', () => {
-            warningScreen.style.display = 'none';
-            gameContainer.style.display = 'block';
-            gameStarted = true;
-            updateView();
-            update();     
+            warningScreen.style.display = 'none'; gameContainer.style.display = 'block'; gameStarted = true;
+            initDust(); updateView(); update();     
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!gameStarted || isMoving) return;
-            mouseX = e.clientX;
+            mouseX = e.clientX; mouseY = e.clientY;
             flashlightLayer.style.setProperty('--x', `${mouseX}px`);
-            flashlightLayer.style.setProperty('--y', `${e.clientY}px`);
+            flashlightLayer.style.setProperty('--y', `${mouseY}px`);
+            
             const edgeThreshold = window.innerWidth * 0.35;
             if (mouseX < edgeThreshold) panSpeed = ((edgeThreshold - mouseX) / edgeThreshold) * 16;
             else if (mouseX > window.innerWidth - edgeThreshold) panSpeed = -((mouseX - (window.innerWidth - edgeThreshold)) / edgeThreshold) * 16;
@@ -193,9 +250,89 @@
             flashlightLayer.style.opacity = isFlashlightOn ? '1' : '0';
         }
 
+        // --- LÓGICA DEL MONSTRUO 001.jar ---
+        function triggerMonster() {
+            isMonsterActive = true;
+            monsterPhase = 1;
+            monsterStunTime = 20.0;
+            
+            // Aparece inicialmente en el centro superior
+            monsterContainer.style.display = 'block';
+            monsterContainer.style.left = '50%';
+            
+            stunTimerContainer.style.display = 'block';
+            dbgStatus.innerText = 'Atacando';
+        }
+
+        function updateMonsterLogic() {
+            if (!isMonsterActive) return;
+
+            // 1. Detectar si la linterna le está apuntando
+            let rect = monsterSprite.getBoundingClientRect();
+            // Calculamos el centro exacto del cuadrado rojo en pantalla
+            let centerX = rect.left + rect.width / 2;
+            let centerY = rect.top + rect.height / 2;
+            
+            // Calculamos distancia entre el mouse (centro linterna) y el monstruo
+            let distancia = Math.hypot(mouseX - centerX, mouseY - centerY);
+            
+            // Si la linterna está prendida y la luz lo toca (radio de unos 200px)
+            let isIlluminated = (isFlashlightOn && distancia < 250);
+            
+            if (isIlluminated) {
+                monsterSprite.classList.add('tremble');
+                monsterStunTime -= 0.016; // Restamos tiempo (aprox 16ms por frame)
+                dbgLight.innerText = 'SÍ';
+                dbgLight.style.color = '#ff0000';
+
+                // Lógica de Evasión (Se mueve para esquivar la luz)
+                monsterEvadeTimer += 0.016;
+                if (monsterEvadeTimer > 1.2) { // Cada ~1.2 segundos siendo alumbrado, intenta moverse
+                    let randomPos = Math.floor(Math.random() * 60) + 20; // Entre 20% y 80% de la pantalla
+                    monsterContainer.style.left = `${randomPos}%`;
+                    monsterEvadeTimer = 0;
+                }
+            } else {
+                monsterSprite.classList.remove('tremble');
+                dbgLight.innerText = 'NO';
+                dbgLight.style.color = '#00ff00';
+            }
+
+            // Actualizar HUD de Stun y Debug
+            let pct = Math.max(0, (monsterStunTime / 20) * 100);
+            stunTimerFill.style.width = `${pct}%`;
+            
+            dbgPhase.innerText = monsterPhase;
+            dbgStun.innerText = Math.max(0, monsterStunTime).toFixed(1);
+
+            // Transición de Fases
+            if (monsterStunTime <= 0) {
+                if (monsterPhase === 1) {
+                    // Pasa a Fase 2, se resetea y cambia de posición drásticamente
+                    monsterPhase = 2;
+                    monsterStunTime = 20.0;
+                    monsterEvadeTimer = 0;
+                    let rotatePos = Math.random() > 0.5 ? '20%' : '80%';
+                    monsterContainer.style.left = rotatePos;
+                    // Aquí podrías rotarlo en el futuro (ej. asomado de lado)
+                } else if (monsterPhase === 2) {
+                    // Derrotado / Sobreviviste
+                    isMonsterActive = false;
+                    monsterContainer.style.display = 'none';
+                    stunTimerContainer.style.display = 'none';
+                    monsterSprite.classList.remove('tremble');
+                    dbgStatus.innerText = 'Se fue';
+                }
+            }
+        }
+
+        // BUCLE PRINCIPAL DEL JUEGO
         function update() {
             if (!gameStarted) return;
             time += 0.08; 
+            
+            drawDust(); // Actualizar partículas de polvo
+
             if (!isMoving) {
                 currentPanX += panSpeed;
                 const maxPan = -(office.offsetWidth - window.innerWidth);
@@ -208,9 +345,13 @@
             else if (battery < 100) { battery += 0.15; if (battery > 100) battery = 100; }
             batteryFill.style.width = `${Math.floor(battery / 2) * 2}%`;
             batteryFill.style.backgroundColor = battery <= 20 ? '#ff0000' : battery <= 50 ? '#ffff00' : '#00ff00';
+            
+            updateMonsterLogic(); // Revisar lógica de 001.jar
+
             requestAnimationFrame(update);
         }
 
+        // LÓGICA DE PUERTAS Y DISPARADOR DEL MONSTRUO
         function toggleDoor() {
             if (!gameStarted || isDoorClosed) return; 
             const wallData = mapa[currentRoom].paredes[currentFacing];
@@ -220,6 +361,13 @@
                 btnForward.style.display = 'none'; 
                 sfxOn.currentTime = 0; sfxOn.play(); 
                 
+                // --- DISPARADOR DE 001.jar ---
+                let chance = Math.floor(Math.random() * 3); // 0, 1, o 2
+                dbgRoll.innerText = chance;
+                if (chance === 2 && !isMonsterActive) {
+                    triggerMonster();
+                }
+
                 doorTimeRemaining = maxDoorTime;
                 doorTimerContainer.style.display = 'block';
                 doorTimerFill.style.width = '100%';
@@ -257,7 +405,6 @@
         const imgPuertaConPuertaON = 'Habitacion_Cuarto_1 puerta abierta_con_puertaON.png';
         const imgMesa1 = 'Habitacion con mesa 1.png';
 
-        // --- MAPA (Ahora con gridX y gridY) ---
         const mapa = {
             'habitacion_1': { gridX: 0, gridY: 3, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
             'habitacion_2': { gridX: 0, gridY: 2, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_3', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_1', hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
@@ -268,69 +415,38 @@
             'habitacion_7': { gridX: -2, gridY: 1, paredes: [{ dir: 0, img: imgPuertaConPuertaOFF, link: 'habitacion_6', hasDoor: true }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgMesa1, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] }
         };
 
-        let currentRoom = 'habitacion_1'; 
-        let currentFacing = 0;      
-        let currentRotation = 0; 
+        let currentRoom = 'habitacion_1', currentFacing = 0, currentRotation = 0; 
         const btnLeft = document.getElementById('btn-left'), btnRight = document.getElementById('btn-right');
         const transitionOverlay = document.getElementById('transition-overlay'), playerArrow = document.getElementById('player-arrow');
 
         function drawMinimap() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Dibujamos corredores primero para que queden por debajo de las salas
-            ctx.strokeStyle = '#555';
-            ctx.lineWidth = 12;
+            mapCtx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+            mapCtx.strokeStyle = '#555'; mapCtx.lineWidth = 12;
             discoveredRooms.forEach(roomId => {
                 const room = mapa[roomId];
-                const px = canvasCenterX + (room.gridX * mapCellSize);
-                const py = canvasCenterY + (room.gridY * mapCellSize);
-
+                const px = mapCanvasCenterX + (room.gridX * mapCellSize), py = mapCanvasCenterY + (room.gridY * mapCellSize);
                 room.paredes.forEach(pared => {
                     if (pared.link && discoveredRooms.has(pared.link)) {
                         const target = mapa[pared.link];
-                        const tx = canvasCenterX + (target.gridX * mapCellSize);
-                        const ty = canvasCenterY + (target.gridY * mapCellSize);
-                        ctx.beginPath();
-                        ctx.moveTo(px, py);
-                        ctx.lineTo(tx, ty);
-                        ctx.stroke();
+                        mapCtx.beginPath(); mapCtx.moveTo(px, py); mapCtx.lineTo(mapCanvasCenterX + (target.gridX * mapCellSize), mapCanvasCenterY + (target.gridY * mapCellSize)); mapCtx.stroke();
                     }
                 });
             });
-
-            // Dibujamos los cuadraditos de las salas encima
-            ctx.fillStyle = '#999';
+            mapCtx.fillStyle = '#999';
             discoveredRooms.forEach(roomId => {
                 const room = mapa[roomId];
-                const px = canvasCenterX + (room.gridX * mapCellSize);
-                const py = canvasCenterY + (room.gridY * mapCellSize);
-                ctx.fillRect(px - 10, py - 10, 20, 20); // Habitaciones de 20x20
+                mapCtx.fillRect(mapCanvasCenterX + (room.gridX * mapCellSize) - 10, mapCanvasCenterY + (room.gridY * mapCellSize) - 10, 20, 20);
             });
         }
 
         function updateMinimapPosition() {
-            let node = mapa[currentRoom];
-            if (!node) return;
-            
-            // Añadir habitación actual a la niebla de guerra y redibujar
-            discoveredRooms.add(currentRoom);
-            drawMinimap();
-
-            // Mover la cámara (el canvas) en dirección opuesta a la sala para mantenerla centrada
-            const containerCenterX = 110; // Mitad de 220px del contenedor
-            const containerCenterY = 110;
-            const targetX = containerCenterX - (canvasCenterX + node.gridX * mapCellSize);
-            const targetY = containerCenterY - (canvasCenterY + node.gridY * mapCellSize);
-
-            canvas.style.transform = `translate(${targetX}px, ${targetY}px)`;
-
-            // Rotar flecha
-            let targetAngle = currentFacing * 90;
-            let diff = (targetAngle - currentRotation) % 360;
-            if (diff < -180) diff += 360;
-            if (diff > 180) diff -= 360;
-            currentRotation += diff;
-            playerArrow.style.transform = `rotate(${currentRotation}deg)`;
+            let node = mapa[currentRoom]; if (!node) return;
+            discoveredRooms.add(currentRoom); drawMinimap();
+            const cx = 110, cy = 110; 
+            mapCanvas.style.transform = `translate(${cx - (mapCanvasCenterX + node.gridX * mapCellSize)}px, ${cy - (mapCanvasCenterY + node.gridY * mapCellSize)}px)`;
+            let targetAngle = currentFacing * 90, diff = (targetAngle - currentRotation) % 360;
+            if (diff < -180) diff += 360; if (diff > 180) diff -= 360;
+            currentRotation += diff; playerArrow.style.transform = `rotate(${currentRotation}deg)`;
         }
 
         function updateView() {
