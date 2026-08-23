@@ -11,84 +11,31 @@
 
         /* PANTALLA DE ADVERTENCIA */
         #warning-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000;
+            z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
         }
-        #warning-screen h1 {
-            color: #ff0000;
-            font-size: 3rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5);
-            letter-spacing: 2px;
-        }
-        #warning-screen p {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            max-width: 600px;
-            margin-bottom: 40px;
-            color: #ccc;
-        }
-        #warning-screen b {
-            color: #fff;
-        }
+        #warning-screen h1 { color: #ff0000; font-size: 3rem; margin-bottom: 20px; text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5); letter-spacing: 2px; }
+        #warning-screen p { font-size: 1.2rem; line-height: 1.6; max-width: 600px; margin-bottom: 40px; color: #ccc; }
+        #warning-screen b { color: #fff; }
         #btn-start {
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            font-family: 'Courier New', Courier, monospace;
-            background-color: transparent;
-            color: #fff;
-            border: 2px solid #fff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
+            padding: 15px 40px; font-size: 1.5rem; font-family: 'Courier New', Courier, monospace;
+            background-color: transparent; color: #fff; border: 2px solid #fff; cursor: pointer;
+            transition: all 0.3s ease; text-transform: uppercase;
         }
-        #btn-start:hover {
-            background-color: #fff;
-            color: #000;
-            box-shadow: 0 0 15px #fff;
-        }
+        #btn-start:hover { background-color: #fff; color: #000; box-shadow: 0 0 15px #fff; }
 
-        /* CONTENEDOR PRINCIPAL DEL JUEGO (Oculto inicialmente) */
+        /* CONTENEDOR PRINCIPAL DEL JUEGO */
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; display: none; }
 
         /* IMAGEN DE LA OFICINA / HABITACIÓN */
         #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
 
-        /* CAPA DE LA PUERTA */
-        #door-overlay { 
-            position: absolute; top: 0; left: 30%; width: 40%; height: 100%; 
-            background-size: cover; background-position: center; 
-            z-index: 2; pointer-events: none; 
-            opacity: 0;
-            transition: opacity 0.2s ease-in; 
-        }
+        /* CAPA Y HITBOX DE LA PUERTA */
+        #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-size: cover; background-position: center; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.2s ease-in; }
+        #door-hitbox { position: absolute; top: 51%; left: 39%; width: 4.5%; height: 13.5%; cursor: pointer; display: none; z-index: 99; background: transparent; border: none; }
 
-        /* HITBOX DE LA PUERTA */
-        #door-hitbox { 
-            position: absolute; 
-            top: 51%; 
-            left: 39%; 
-            width: 4.5%; 
-            height: 13.5%; 
-            cursor: pointer; 
-            display: none; 
-            z-index: 99; 
-            background: transparent; 
-            border: none;            
-        }
-
-        /* CAPAS VISUALES (Oscuridad, Linterna, CRT) */
+        /* CAPAS VISUALES */
         #darkness-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.995); z-index: 10; pointer-events: none; }
         #flashlight-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 11; pointer-events: none; opacity: 0; background: radial-gradient(circle 350px at var(--x, 50%) var(--y, 50%), rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0.95) 80%, rgba(0, 0, 0, 1) 100%); }
         #shader-lens { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; box-shadow: inset 0 0 120px rgba(0,0,0,1); background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; }
@@ -102,27 +49,26 @@
         #instructions { position: absolute; top: 20px; right: 20px; z-index: 50; font-size: 1.2rem; text-shadow: 2px 2px 0 #000; opacity: 0.7; }
 
         /* TEMPORIZADOR DE LA PUERTA (HUD) */
-        #door-timer-container {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            width: 300px; height: 25px; border: 2px solid #fff; padding: 2px;
-            background: rgba(0,0,0,0.5); display: none; z-index: 50;
-        }
+        #door-timer-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 300px; height: 25px; border: 2px solid #fff; padding: 2px; background: rgba(0,0,0,0.5); display: none; z-index: 50; }
         #door-timer-fill { width: 100%; height: 100%; background-color: #00aaff; transition: width 1s linear, background-color 0.5s ease; }
         #door-timer-text { position: absolute; width: 100%; text-align: center; top: 2px; left: 0; font-size: 1rem; text-shadow: 1px 1px 0 #000; pointer-events: none; }
 
-        /* MINIMAPA */
+        /* MINIMAPA NUEVO (CANVAS + CAMARA FIJA) */
         #minimap-container { 
             position: absolute; top: 20px; left: 20px; width: 220px; height: 220px; 
-            background-image: url('Mapa_minijuego.png'); background-size: contain; background-repeat: no-repeat; background-position: center; 
             border: 2px solid #444; z-index: 50; background-color: rgba(0, 0, 0, 0.9); 
+            overflow: hidden; /* Oculta lo que sale del borde */
+        }
+        #minimap-canvas {
+            position: absolute; top: 0; left: 0;
+            transition: transform 0.8s ease; /* Transición para que la cámara se mueva suave */
         }
         #player-arrow { 
             position: absolute; width: 10px; height: 10px; background-color: white; border-radius: 50%; 
-            transition: left 0.8s, top 0.8s, transform 0.2s ease; transform-origin: center; z-index: 55; box-shadow: 0 0 4px white; 
+            top: 50%; left: 50%; margin-top: -5px; margin-left: -5px; /* Siempre en el centro */
+            transition: transform 0.2s ease; transform-origin: center; z-index: 55; box-shadow: 0 0 4px white; 
         }
-        #player-arrow::after { 
-            content: ''; position: absolute; top: -8px; left: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid red; 
-        }
+        #player-arrow::after { content: ''; position: absolute; top: -8px; left: 0px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid red; }
 
         /* BOTONES DE NAVEGACIÓN */
         .nav-btn { position: absolute; z-index: 40; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.5); font-size: 2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; }
@@ -137,11 +83,9 @@
     <!-- PANTALLA DE ADVERTENCIA -->
     <div id="warning-screen">
         <h1>¡ADVERTENCIA!</h1>
-        <p>
-            Este juego contiene <b>sustos repentinos (jumpscares)</b> y ruidos fuertes.<br><br>
-            Si las criaturas del laberinto te llegan a atrapar, <b>la página se cerrará automáticamente</b>.<br><br>
-            Entra bajo tu propio riesgo y ve con cuidado...
-        </p>
+        <p>Este juego contiene <b>sustos repentinos (jumpscares)</b> y ruidos fuertes.<br><br>
+        Si las criaturas del laberinto te llegan a atrapar, <b>la página se cerrará automáticamente</b>.<br><br>
+        Entra bajo tu propio riesgo y ve con cuidado...</p>
         <button id="btn-start">EMPEZAR</button>
     </div>
 
@@ -157,18 +101,17 @@
         <div id="transition-overlay"></div>
 
         <div id="instructions">Presiona 'F' para usar la linterna</div>
-        
-        <div id="door-timer-container">
-            <div id="door-timer-fill"></div>
-            <div id="door-timer-text">Cerrada (Bloqueada)</div>
-        </div>
+        <div id="door-timer-container"><div id="door-timer-fill"></div><div id="door-timer-text">Cerrada (Bloqueada)</div></div>
         
         <div id="ui-layer">
             <img class="battery-icon" src="https://cdn.icon-icons.com/icons2/2406/PNG/512/battery_full_solid_icon_146059.png" alt="Bateria">
             <div class="battery-bar-container"><div class="battery-fill" id="battery-fill"></div></div>
         </div>
 
-        <div id="minimap-container"><div id="player-arrow"></div></div>
+        <div id="minimap-container">
+            <canvas id="minimap-canvas" width="1000" height="1000"></canvas>
+            <div id="player-arrow"></div>
+        </div>
 
         <div id="btn-left" class="nav-btn">◄</div>
         <div id="btn-right" class="nav-btn">►</div>
@@ -178,75 +121,68 @@
     <script>
         // --- SONIDOS ---
         const sfxOn = new Audio('https://actions.google.com/sounds/v1/foley/cassette_tape_button.ogg');
-        const sfxOff = new Audio('https://actions.google.com/sounds/v1/foley/cassette_tape_button.ogg');
-        sfxOff.playbackRate = 0.8;
+        const sfxOff = new Audio('https://actions.google.com/sounds/v1/foley/cassette_tape_button.ogg'); sfxOff.playbackRate = 0.8;
         const sfxBroken = new Audio('https://actions.google.com/sounds/v1/science_fiction/spark.ogg');
         const sfxStep = new Audio('https://actions.google.com/sounds/v1/foley/footstep_single_hard_surface.ogg'); 
-
         sfxOn.volume = 0.6; sfxOff.volume = 0.6; sfxBroken.volume = 0.5; sfxStep.volume = 0.7;
 
+        // --- REFERENCIAS DOM ---
         const warningScreen = document.getElementById('warning-screen');
         const gameContainer = document.getElementById('game-container');
         const btnStart = document.getElementById('btn-start');
-
         const office = document.getElementById('office');
         const darknessLayer = document.getElementById('darkness-layer');
         const flashlightLayer = document.getElementById('flashlight-layer');
         const batteryFill = document.getElementById('battery-fill');
-        const doorOverlay = document.getElementById('door-overlay');
         const doorHitbox = document.getElementById('door-hitbox');
         const btnForward = document.getElementById('btn-forward');
-        
-        // Variables HUD Puerta
         const doorTimerContainer = document.getElementById('door-timer-container');
         const doorTimerFill = document.getElementById('door-timer-fill');
+
+        // --- SISTEMA DE MINIMAPA Y CANVAS ---
+        const canvas = document.getElementById('minimap-canvas');
+        const ctx = canvas.getContext('2d');
+        const discoveredRooms = new Set(['habitacion_1']); // Niebla de guerra
+        const mapCellSize = 35; // Tamaño de cada cuadrito en píxeles
+        const canvasCenterX = canvas.width / 2;
+        const canvasCenterY = canvas.height / 2;
 
         let isFlashlightOn = false;
         let battery = 100;
         let mouseX = window.innerWidth / 2;
-        let panSpeed = 0;
-        let currentPanX = 0;
-        let time = 0; 
-        let isMoving = false;
-        let gameStarted = false; // Variable de control para saber si el juego inició
+        let panSpeed = 0, currentPanX = 0, time = 0; 
+        let isMoving = false, gameStarted = false; 
         
-        // Lógica de Puerta 
         let isDoorClosed = false;
         let doorInterval = null;
         let doorTimeRemaining = 0;
-        const maxDoorTime = 120; // 2 minutos (120 segundos)
+        const maxDoorTime = 120; // 2 minutos
 
-        // --- SISTEMA DE INICIO (BOTÓN EMPEZAR) ---
         btnStart.addEventListener('click', () => {
             warningScreen.style.display = 'none';
             gameContainer.style.display = 'block';
             gameStarted = true;
-            updateView(); // Forzamos una actualización visual al entrar
-            update();     // Iniciamos el bucle del juego
+            updateView();
+            update();     
         });
 
-        // RASTREO DEL RATÓN Y PARALLAX 3D
         window.addEventListener('mousemove', (e) => {
             if (!gameStarted || isMoving) return;
             mouseX = e.clientX;
             flashlightLayer.style.setProperty('--x', `${mouseX}px`);
             flashlightLayer.style.setProperty('--y', `${e.clientY}px`);
-
-            const screenWidth = window.innerWidth;
-            const edgeThreshold = screenWidth * 0.35;
+            const edgeThreshold = window.innerWidth * 0.35;
             if (mouseX < edgeThreshold) panSpeed = ((edgeThreshold - mouseX) / edgeThreshold) * 16;
-            else if (mouseX > screenWidth - edgeThreshold) panSpeed = -((mouseX - (screenWidth - edgeThreshold)) / edgeThreshold) * 16;
+            else if (mouseX > window.innerWidth - edgeThreshold) panSpeed = -((mouseX - (window.innerWidth - edgeThreshold)) / edgeThreshold) * 16;
             else panSpeed = 0;
         });
 
-        // BOTÓN DE LINTERNA ('F')
         window.addEventListener('keydown', (e) => {
             if (!gameStarted) return;
             if (e.key.toLowerCase() === 'f' && !isMoving) {
                 if (battery > 0) {
                     isFlashlightOn = !isFlashlightOn;
-                    if (isFlashlightOn) { sfxOn.currentTime = 0; sfxOn.play(); }
-                    else { sfxOff.currentTime = 0; sfxOff.play(); }
+                    if (isFlashlightOn) { sfxOn.currentTime = 0; sfxOn.play(); } else { sfxOff.currentTime = 0; sfxOff.play(); }
                     actualizarLuces();
                 } else if (!isFlashlightOn) { sfxBroken.currentTime = 0; sfxBroken.play(); }
             }
@@ -257,68 +193,45 @@
             flashlightLayer.style.opacity = isFlashlightOn ? '1' : '0';
         }
 
-        // BUCLE PRINCIPAL DE ANIMACIÓN
         function update() {
-            if (!gameStarted) return; // Seguridad extra
-            
+            if (!gameStarted) return;
             time += 0.08; 
             if (!isMoving) {
                 currentPanX += panSpeed;
                 const maxPan = -(office.offsetWidth - window.innerWidth);
                 if (currentPanX > 0) currentPanX = 0; 
                 if (currentPanX < maxPan) currentPanX = maxPan;
-                
                 office.style.transform = `translate3d(${currentPanX + Math.sin(time * 0.6) * 10}px, ${Math.cos(time * 0.8) * 6}px, 0) scale(1.25) rotateY(${((currentPanX / maxPan) - 0.5) * 18}deg)`;
             }
 
-            // GESTIÓN DE BATERÍA DE LA LINTERNA
-            if (isFlashlightOn) { 
-                battery -= 0.12; 
-                if (battery <= 0) { battery = 0; isFlashlightOn = false; sfxBroken.play(); actualizarLuces(); } 
-            }
-            else if (battery < 100) { 
-                battery += 0.15; 
-                if (battery > 100) battery = 100; 
-            }
+            if (isFlashlightOn) { battery -= 0.12; if (battery <= 0) { battery = 0; isFlashlightOn = false; sfxBroken.play(); actualizarLuces(); } }
+            else if (battery < 100) { battery += 0.15; if (battery > 100) battery = 100; }
             batteryFill.style.width = `${Math.floor(battery / 2) * 2}%`;
             batteryFill.style.backgroundColor = battery <= 20 ? '#ff0000' : battery <= 50 ? '#ffff00' : '#00ff00';
-
             requestAnimationFrame(update);
         }
 
-        // ANIMACIÓN Y LÓGICA DE LA PUERTA
         function toggleDoor() {
-            if (!gameStarted) return;
+            if (!gameStarted || isDoorClosed) return; 
             const wallData = mapa[currentRoom].paredes[currentFacing];
-            
-            // Si la puerta ya está cerrada, IGNORAMOS el clic (no se puede volver a abrir manualmente)
-            if (isDoorClosed) return; 
-
             if (wallData && wallData.hasDoor) {
-                // CERRAR PUERTA
                 isDoorClosed = true;
                 office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
                 btnForward.style.display = 'none'; 
                 sfxOn.currentTime = 0; sfxOn.play(); 
                 
-                // Iniciar Temporizador de 2 minutos
                 doorTimeRemaining = maxDoorTime;
                 doorTimerContainer.style.display = 'block';
                 doorTimerFill.style.width = '100%';
                 doorTimerFill.style.backgroundColor = '#00aaff';
                 
                 if(doorInterval) clearInterval(doorInterval);
-                
                 doorInterval = setInterval(() => {
                     doorTimeRemaining -= 1;
                     let percentage = (doorTimeRemaining / maxDoorTime) * 100;
                     doorTimerFill.style.width = `${percentage}%`;
-                    
                     if(percentage <= 25) doorTimerFill.style.backgroundColor = '#ff0000';
-
-                    if (doorTimeRemaining <= 0) {
-                        abrirPuertaAutomaticamente();
-                    }
+                    if (doorTimeRemaining <= 0) abrirPuertaAutomaticamente();
                 }, 1000); 
             }
         }
@@ -328,8 +241,6 @@
             if(doorInterval) clearInterval(doorInterval);
             doorTimerContainer.style.display = 'none';
             sfxOff.currentTime = 0; sfxOff.play();
-
-            // Actualizar la imagen si seguimos viendo la pared de la puerta
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData && wallData.hasDoor) {
                 office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png')`;
@@ -337,47 +248,83 @@
             }
         }
 
-        // --- IMÁGENES BASE ---
         const imgPuertaSinPuerta = 'Habitacion_Cuarto_1 puerta abierta sin puerta.png';
         const imgCuartoCerrado = 'Habitacion_Cuarto_cerrado.png';
         const img2CaminosIzq = 'Habitacion_2_caminos_segundocamino_izquierda.png';
         const img3Caminos = 'Habitacion_3_caminos.png';
         const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.png';
-        
         const imgPuertaConPuertaOFF = 'Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png';
         const imgPuertaConPuertaON = 'Habitacion_Cuarto_1 puerta abierta_con_puertaON.png';
         const imgMesa1 = 'Habitacion con mesa 1.png';
 
-        // --- MAPA ---
+        // --- MAPA (Ahora con gridX y gridY) ---
         const mapa = {
-            'habitacion_1': { x: 110, y: 185, type: 'room', paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
-            'habitacion_2': { x: 110, y: 165, type: 'room', paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_3', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_1', hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
-            'habitacion_3': { x: 110, y: 145, type: 'room', paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
-            'habitacion_4': { x: 110, y: 125, type: 'room', paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: img2CaminosDer, link: null, hasDoor: false }, { dir: 2, img: img3Caminos, link: 'habitacion_3', hasDoor: false }, { dir: 3, img: img2CaminosIzq, link: 'habitacion_5', hasDoor: false }] },
-            'habitacion_5': { x: 90, y: 125, type: 'room', paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 3, img: imgPuertaSinPuerta, link: 'habitacion_6', hasDoor: false }] },
-            'habitacion_6': { x: 70, y: 125, type: 'room', paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: img2CaminosDer, link: 'habitacion_5', hasDoor: false }, { dir: 2, img: img3Caminos, link: 'habitacion_7', hasDoor: false }, { dir: 3, img: img2CaminosIzq, link: null, hasDoor: false }] },
-            'habitacion_7': { x: 70, y: 145, type: 'room', paredes: [{ dir: 0, img: imgPuertaConPuertaOFF, link: 'habitacion_6', hasDoor: true }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgMesa1, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] }
+            'habitacion_1': { gridX: 0, gridY: 3, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
+            'habitacion_2': { gridX: 0, gridY: 2, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_3', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_1', hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
+            'habitacion_3': { gridX: 0, gridY: 1, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
+            'habitacion_4': { gridX: 0, gridY: 0, paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: img2CaminosDer, link: null, hasDoor: false }, { dir: 2, img: img3Caminos, link: 'habitacion_3', hasDoor: false }, { dir: 3, img: img2CaminosIzq, link: 'habitacion_5', hasDoor: false }] },
+            'habitacion_5': { gridX: -1, gridY: 0, paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 3, img: imgPuertaSinPuerta, link: 'habitacion_6', hasDoor: false }] },
+            'habitacion_6': { gridX: -2, gridY: 0, paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: img2CaminosDer, link: 'habitacion_5', hasDoor: false }, { dir: 2, img: img3Caminos, link: 'habitacion_7', hasDoor: false }, { dir: 3, img: img2CaminosIzq, link: null, hasDoor: false }] },
+            'habitacion_7': { gridX: -2, gridY: 1, paredes: [{ dir: 0, img: imgPuertaConPuertaOFF, link: 'habitacion_6', hasDoor: true }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgMesa1, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] }
         };
 
         let currentRoom = 'habitacion_1'; 
         let currentFacing = 0;      
         let currentRotation = 0; 
+        const btnLeft = document.getElementById('btn-left'), btnRight = document.getElementById('btn-right');
+        const transitionOverlay = document.getElementById('transition-overlay'), playerArrow = document.getElementById('player-arrow');
 
-        const btnLeft = document.getElementById('btn-left');
-        const btnRight = document.getElementById('btn-right');
-        const transitionOverlay = document.getElementById('transition-overlay');
-        const playerArrow = document.getElementById('player-arrow');
+        function drawMinimap() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibujamos corredores primero para que queden por debajo de las salas
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 12;
+            discoveredRooms.forEach(roomId => {
+                const room = mapa[roomId];
+                const px = canvasCenterX + (room.gridX * mapCellSize);
+                const py = canvasCenterY + (room.gridY * mapCellSize);
 
-        function updateMinimapPosition(animated = false) {
+                room.paredes.forEach(pared => {
+                    if (pared.link && discoveredRooms.has(pared.link)) {
+                        const target = mapa[pared.link];
+                        const tx = canvasCenterX + (target.gridX * mapCellSize);
+                        const ty = canvasCenterY + (target.gridY * mapCellSize);
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.lineTo(tx, ty);
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            // Dibujamos los cuadraditos de las salas encima
+            ctx.fillStyle = '#999';
+            discoveredRooms.forEach(roomId => {
+                const room = mapa[roomId];
+                const px = canvasCenterX + (room.gridX * mapCellSize);
+                const py = canvasCenterY + (room.gridY * mapCellSize);
+                ctx.fillRect(px - 10, py - 10, 20, 20); // Habitaciones de 20x20
+            });
+        }
+
+        function updateMinimapPosition() {
             let node = mapa[currentRoom];
             if (!node) return;
-            let targetLeft = node.x; 
-            let targetTop = node.y;
+            
+            // Añadir habitación actual a la niebla de guerra y redibujar
+            discoveredRooms.add(currentRoom);
+            drawMinimap();
 
-            playerArrow.style.transition = animated ? 'left 0.8s steps(5), top 0.8s steps(5), transform 0.2s ease' : 'transform 0.2s ease';
-            playerArrow.style.left = targetLeft + 'px';
-            playerArrow.style.top = targetTop + 'px';
+            // Mover la cámara (el canvas) en dirección opuesta a la sala para mantenerla centrada
+            const containerCenterX = 110; // Mitad de 220px del contenedor
+            const containerCenterY = 110;
+            const targetX = containerCenterX - (canvasCenterX + node.gridX * mapCellSize);
+            const targetY = containerCenterY - (canvasCenterY + node.gridY * mapCellSize);
 
+            canvas.style.transform = `translate(${targetX}px, ${targetY}px)`;
+
+            // Rotar flecha
             let targetAngle = currentFacing * 90;
             let diff = (targetAngle - currentRotation) % 360;
             if (diff < -180) diff += 360;
@@ -388,73 +335,49 @@
 
         function updateView() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
-            
             if (wallData && wallData.hasDoor) {
                 doorHitbox.style.display = 'block';
-                if (isDoorClosed) {
-                    office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`;
-                    btnForward.style.display = 'none';
-                } else {
-                    office.style.backgroundImage = `url('${wallData.img}')`; 
-                    btnForward.style.display = wallData.link !== null ? 'flex' : 'none';
-                }
+                if (isDoorClosed) { office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`; btnForward.style.display = 'none'; } 
+                else { office.style.backgroundImage = `url('${wallData.img}')`; btnForward.style.display = wallData.link !== null ? 'flex' : 'none'; }
             } else {
                 doorHitbox.style.display = 'none';
                 office.style.backgroundImage = `url('${wallData.img}')`;
                 btnForward.style.display = wallData.link !== null ? 'flex' : 'none';
             }
-
-            updateMinimapPosition(false);
+            updateMinimapPosition();
         }
 
         btnLeft.addEventListener('click', () => {
             if (!gameStarted || isMoving) return;
-            isMoving = true;
-            transitionOverlay.style.opacity = '1';
-            setTimeout(() => {
-                currentFacing = (currentFacing - 1 + 4) % 4;
-                updateView();
-                setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100);
-            }, 150);
+            isMoving = true; transitionOverlay.style.opacity = '1';
+            setTimeout(() => { currentFacing = (currentFacing - 1 + 4) % 4; updateView(); setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100); }, 150);
         });
 
         btnRight.addEventListener('click', () => {
             if (!gameStarted || isMoving) return;
-            isMoving = true;
-            transitionOverlay.style.opacity = '1';
-            setTimeout(() => {
-                currentFacing = (currentFacing + 1) % 4;
-                updateView();
-                setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100);
-            }, 150);
+            isMoving = true; transitionOverlay.style.opacity = '1';
+            setTimeout(() => { currentFacing = (currentFacing + 1) % 4; updateView(); setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100); }, 150);
         });
 
         btnForward.addEventListener('click', () => {
             if (!gameStarted || isMoving || isDoorClosed) return; 
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData.link !== null) {
-                isMoving = true;
-                sfxStep.currentTime = 0; sfxStep.play();
-
+                isMoving = true; sfxStep.currentTime = 0; sfxStep.play();
                 office.style.transition = 'transform 0.6s ease-in';
                 office.style.transform = 'translate3d(0, 0, 0) scale(2.2) rotateY(0deg)';
                 currentRoom = wallData.link;
-                updateMinimapPosition(true);
-
+                
                 setTimeout(() => {
                     transitionOverlay.style.opacity = '1';
                     setTimeout(() => {
-                        office.style.transition = 'none';
-                        currentPanX = 0; 
+                        office.style.transition = 'none'; currentPanX = 0; 
                         updateView();
                         setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100);
                     }, 200);
                 }, 550);
             }
         });
-
-        updateMinimapPosition(false); 
-        // No llamamos a updateView() ni a update() aquí abajo, se llamarán al dar click a "Empezar"
     </script>
 </body>
 </html>
