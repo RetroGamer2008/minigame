@@ -9,8 +9,58 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body { background-color: #000; overflow: hidden; color: white; font-family: 'Courier New', Courier, monospace; }
 
-        /* CONTENEDOR PRINCIPAL */
-        #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; }
+        /* PANTALLA DE ADVERTENCIA */
+        #warning-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        #warning-screen h1 {
+            color: #ff0000;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+        #warning-screen p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-bottom: 40px;
+            color: #ccc;
+        }
+        #warning-screen b {
+            color: #fff;
+        }
+        #btn-start {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        #btn-start:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 15px #fff;
+        }
+
+        /* CONTENEDOR PRINCIPAL DEL JUEGO (Oculto inicialmente) */
+        #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; display: none; }
 
         /* IMAGEN DE LA OFICINA / HABITACIÓN */
         #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
@@ -24,7 +74,7 @@
             transition: opacity 0.2s ease-in; 
         }
 
-        /* HITBOX DE LA PUERTA - TUS VALORES EXACTOS */
+        /* HITBOX DE LA PUERTA */
         #door-hitbox { 
             position: absolute; 
             top: 51%; 
@@ -84,6 +134,18 @@
 </head>
 <body>
 
+    <!-- PANTALLA DE ADVERTENCIA -->
+    <div id="warning-screen">
+        <h1>¡ADVERTENCIA!</h1>
+        <p>
+            Este juego contiene <b>sustos repentinos (jumpscares)</b> y ruidos fuertes.<br><br>
+            Si las criaturas del laberinto te llegan a atrapar, <b>la página se cerrará automáticamente</b>.<br><br>
+            Entra bajo tu propio riesgo y ve con cuidado...
+        </p>
+        <button id="btn-start">EMPEZAR</button>
+    </div>
+
+    <!-- JUEGO PRINCIPAL -->
     <div id="game-container">
         <div id="office">
             <div id="door-overlay"></div>
@@ -123,6 +185,10 @@
 
         sfxOn.volume = 0.6; sfxOff.volume = 0.6; sfxBroken.volume = 0.5; sfxStep.volume = 0.7;
 
+        const warningScreen = document.getElementById('warning-screen');
+        const gameContainer = document.getElementById('game-container');
+        const btnStart = document.getElementById('btn-start');
+
         const office = document.getElementById('office');
         const darknessLayer = document.getElementById('darkness-layer');
         const flashlightLayer = document.getElementById('flashlight-layer');
@@ -142,6 +208,7 @@
         let currentPanX = 0;
         let time = 0; 
         let isMoving = false;
+        let gameStarted = false; // Variable de control para saber si el juego inició
         
         // Lógica de Puerta 
         let isDoorClosed = false;
@@ -149,9 +216,18 @@
         let doorTimeRemaining = 0;
         const maxDoorTime = 120; // 2 minutos (120 segundos)
 
+        // --- SISTEMA DE INICIO (BOTÓN EMPEZAR) ---
+        btnStart.addEventListener('click', () => {
+            warningScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+            gameStarted = true;
+            updateView(); // Forzamos una actualización visual al entrar
+            update();     // Iniciamos el bucle del juego
+        });
+
         // RASTREO DEL RATÓN Y PARALLAX 3D
         window.addEventListener('mousemove', (e) => {
-            if (isMoving) return;
+            if (!gameStarted || isMoving) return;
             mouseX = e.clientX;
             flashlightLayer.style.setProperty('--x', `${mouseX}px`);
             flashlightLayer.style.setProperty('--y', `${e.clientY}px`);
@@ -165,6 +241,7 @@
 
         // BOTÓN DE LINTERNA ('F')
         window.addEventListener('keydown', (e) => {
+            if (!gameStarted) return;
             if (e.key.toLowerCase() === 'f' && !isMoving) {
                 if (battery > 0) {
                     isFlashlightOn = !isFlashlightOn;
@@ -182,6 +259,8 @@
 
         // BUCLE PRINCIPAL DE ANIMACIÓN
         function update() {
+            if (!gameStarted) return; // Seguridad extra
+            
             time += 0.08; 
             if (!isMoving) {
                 currentPanX += panSpeed;
@@ -206,10 +285,10 @@
 
             requestAnimationFrame(update);
         }
-        update();
 
         // ANIMACIÓN Y LÓGICA DE LA PUERTA
         function toggleDoor() {
+            if (!gameStarted) return;
             const wallData = mapa[currentRoom].paredes[currentFacing];
             
             // Si la puerta ya está cerrada, IGNORAMOS el clic (no se puede volver a abrir manualmente)
@@ -329,7 +408,7 @@
         }
 
         btnLeft.addEventListener('click', () => {
-            if (isMoving) return;
+            if (!gameStarted || isMoving) return;
             isMoving = true;
             transitionOverlay.style.opacity = '1';
             setTimeout(() => {
@@ -340,7 +419,7 @@
         });
 
         btnRight.addEventListener('click', () => {
-            if (isMoving) return;
+            if (!gameStarted || isMoving) return;
             isMoving = true;
             transitionOverlay.style.opacity = '1';
             setTimeout(() => {
@@ -351,7 +430,7 @@
         });
 
         btnForward.addEventListener('click', () => {
-            if (isMoving || isDoorClosed) return; 
+            if (!gameStarted || isMoving || isDoorClosed) return; 
             const wallData = mapa[currentRoom].paredes[currentFacing];
             if (wallData.link !== null) {
                 isMoving = true;
@@ -375,7 +454,7 @@
         });
 
         updateMinimapPosition(false); 
-        updateView();
+        // No llamamos a updateView() ni a update() aquí abajo, se llamarán al dar click a "Empezar"
     </script>
 </body>
 </html>
