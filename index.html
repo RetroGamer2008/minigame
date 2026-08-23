@@ -162,9 +162,9 @@
                 office.style.transform = `translate3d(${currentPanX + Math.sin(time * 0.6) * 10}px, ${Math.cos(time * 0.8) * 6}px, 0) scale(1.25) rotateY(${((currentPanX / maxPan) - 0.5) * 18}deg)`;
             }
 
-            // GESTIÓN DE BATERÍA DE LA LINTERNA (¡REDUCIDO PARA QUE DURE MÁS!)
+            // GESTIÓN DE BATERÍA DE LA LINTERNA
             if (isFlashlightOn) { 
-                battery -= 0.12; // Antes era 0.35
+                battery -= 0.12; 
                 if (battery <= 0) { battery = 0; isFlashlightOn = false; sfxBroken.play(); actualizarLuces(); } 
             }
             else if (battery < 100) { 
@@ -199,12 +199,12 @@
         const img3Caminos = 'Habitacion_3_caminos.png';
         const img2CaminosDer = 'Habitacion_2_caminos_segundocamino_derecha.png';
 
-        // --- MAPA (Habitaciones 1 a la 6) ---
+        // --- MAPA (Habitaciones 1 a la 6 corregidas: 6 a la izquierda de la 5) ---
         const mapa = {
             'habitacion_1': { 
                 x: 110, y: 185, type: 'room', 
                 paredes: [
-                    { dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, // Norte
+                    { dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, // Norte -> Hab 2
                     { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false },             // Este
                     { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false },             // Sur
                     { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }              // Oeste
@@ -213,18 +213,18 @@
             'habitacion_2': { 
                 x: 110, y: 165, type: 'room', 
                 paredes: [
-                    { dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_3', hasDoor: false }, // Norte
+                    { dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_3', hasDoor: false }, // Norte -> Hab 3
                     { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false },             // Este
-                    { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_1', hasDoor: false }, // Sur (Regreso)
+                    { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_1', hasDoor: false }, // Sur -> Hab 1
                     { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }              // Oeste
                 ] 
             },
             'habitacion_3': { 
                 x: 110, y: 145, type: 'room', 
                 paredes: [
-                    { dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, // Norte
+                    { dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, // Norte -> Hab 4
                     { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false },             // Este
-                    { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, // Sur (Regreso)
+                    { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, // Sur -> Hab 2
                     { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }              // Oeste
                 ] 
             },
@@ -232,27 +232,27 @@
                 x: 110, y: 125, type: 'room', 
                 paredes: [
                     { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
-                    { dir: 1, img: img2CaminosDer, link: 'habitacion_5', hasDoor: false },     // Este (Va a Hab 5)
-                    { dir: 2, img: img3Caminos, link: 'habitacion_3', hasDoor: false },        // Sur (Regreso a 3)
-                    { dir: 3, img: img2CaminosIzq, link: 'habitacion_6', hasDoor: false }      // Oeste (Va a Hab 6)
+                    { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false },             // Este
+                    { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_3', hasDoor: false }, // Sur -> Hab 3
+                    { dir: 3, img: img2CaminosDer, link: 'habitacion_5', hasDoor: false }      // Oeste -> Hab 5
                 ] 
             },
             'habitacion_5': { 
-                x: 140, y: 125, type: 'room', // Se dibuja a la derecha en el minimapa
+                x: 90, y: 125, type: 'room', 
                 paredes: [
                     { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
-                    { dir: 1, img: imgPuertaSinPuerta, link: null, hasDoor: false },           // Este (Aún sin link)
+                    { dir: 1, img: img2CaminosIzq, link: 'habitacion_4', hasDoor: false },     // Este -> Hab 4
                     { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false },             // Sur
-                    { dir: 3, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }  // Oeste (Regreso a 4)
+                    { dir: 3, img: img2CaminosDer, link: 'habitacion_6', hasDoor: false }      // Oeste -> Hab 6 (izquierda)
                 ] 
             },
             'habitacion_6': { 
-                x: 80, y: 125, type: 'room', // Se dibuja a la izquierda en el minimapa
+                x: 70, y: 125, type: 'room', // Posicionada a la izquierda de la 5
                 paredes: [
                     { dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false },             // Norte
-                    { dir: 1, img: img2CaminosIzq, link: 'habitacion_4', hasDoor: false },     // Este (Regreso a 4)
-                    { dir: 2, img: img3Caminos, link: null, hasDoor: false },                  // Sur (Aún sin link)
-                    { dir: 3, img: img2CaminosDer, link: null, hasDoor: false }                // Oeste (Aún sin link)
+                    { dir: 1, img: img2CaminosIzq, link: 'habitacion_5', hasDoor: false },     // Este -> Hab 5 (regreso)
+                    { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false },             // Sur
+                    { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }              // Oeste
                 ] 
             }
         };
