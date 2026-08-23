@@ -21,18 +21,18 @@
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; display: none; }
 
         /* IMAGEN DE LA OFICINA / HABITACIÓN */
-        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; }
+        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; transform-style: preserve-3d; }
 
         /* CAPA Y HITBOX DE LA PUERTA */
         #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-size: cover; background-position: center; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.2s ease-in; }
         #door-hitbox { position: absolute; top: 51%; left: 39%; width: 4.5%; height: 13.5%; cursor: pointer; display: none; z-index: 99; background: transparent; border: none; }
 
-        /* EFECTO POLVO AMBIENTAL */
-        #dust-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 4; pointer-events: none; opacity: 0.6; }
+        /* EFECTO POLVO AMBIENTAL (Ahora dentro del escenario con transform-style) */
+        #dust-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3; pointer-events: none; opacity: 0.6; }
 
-        /* MONSTRUO 001_jar */
-        #monster-container { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); z-index: 5; display: none; transition: left 0.8s ease-out; /* Permite que se deslice suavemente al esquivar */ }
-        .monster-sprite { width: 150px; height: 150px; background-color: red; box-shadow: 0 0 20px darkred; border: 3px solid black; }
+        /* MONSTRUO 001_jar (Ahora posicionado estáticamente dentro del escenario para moverse junto a la oficina) */
+        #monster-container { position: absolute; top: 38%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; }
+        .monster-sprite { width: 120px; height: 120px; background-color: red; box-shadow: 0 0 20px darkred; border: 3px solid black; }
         /* Animación de temblor cuando es alumbrado */
         .tremble { animation: shake 0.1s infinite; }
         @keyframes shake {
@@ -98,22 +98,22 @@
         Monstruo: <span id="dbg-status">Inactivo</span><br>
         Fase: <span id="dbg-phase">0</span><br>
         Stun: <span id="dbg-stun">0.0</span>s<br>
+        Cooldown: <span id="dbg-cd">0</span>s<br>
         Iluminado: <span id="dbg-light">NO</span>
     </div>
 
     <!-- JUEGO PRINCIPAL -->
     <div id="game-container">
+        <!-- EL ESCENARIO QUE CONTIENE TODO LO DEL ENTORNO -->
         <div id="office">
             <div id="door-overlay"></div>
             <div id="door-hitbox" onclick="toggleDoor()"></div>
-        </div>
-        
-        <!-- CANVAS PARA POLVO -->
-        <canvas id="dust-canvas"></canvas>
-
-        <!-- MONSTRUO 001_jar -->
-        <div id="monster-container">
-            <div id="monster-sprite" class="monster-sprite"></div>
+            <!-- CANVAS PARA POLVO (Ahora parte del escenario) -->
+            <canvas id="dust-canvas"></canvas>
+            <!-- MONSTRUO 001_jar (Ahora dentro del escenario para moverse junto a la oficina) -->
+            <div id="monster-container">
+                <div id="monster-sprite" class="monster-sprite"></div>
+            </div>
         </div>
 
         <div id="darkness-layer"></div>
@@ -165,7 +165,7 @@
         
         // Referencias Debug
         const dbgRoll = document.getElementById('dbg-roll'), dbgStatus = document.getElementById('dbg-status');
-        const dbgPhase = document.getElementById('dbg-phase'), dbgStun = document.getElementById('dbg-stun'), dbgLight = document.getElementById('dbg-light');
+        const dbgPhase = document.getElementById('dbg-phase'), dbgStun = document.getElementById('dbg-stun'), dbgCd = document.getElementById('dbg-cd'), dbgLight = document.getElementById('dbg-light');
 
         // --- SISTEMA DE POLVO (CANVAS) ---
         const dustCanvas = document.getElementById('dust-canvas');
@@ -173,15 +173,15 @@
         let particles = [];
         
         function initDust() {
-            dustCanvas.width = window.innerWidth;
-            dustCanvas.height = window.innerHeight;
-            for(let i = 0; i < 40; i++) { // 40 partículas
+            dustCanvas.width = window.innerWidth * 1.8;
+            dustCanvas.height = window.innerHeight * 1.2;
+            for(let i = 0; i < 40; i++) { 
                 particles.push({
                     x: Math.random() * dustCanvas.width,
                     y: Math.random() * dustCanvas.height,
                     size: Math.random() * 2 + 1,
                     speedX: (Math.random() - 0.5) * 0.4,
-                    speedY: (Math.random() - 1) * 0.6 // Suben lentamente
+                    speedY: (Math.random() - 1) * 0.6 
                 });
             }
         }
@@ -191,7 +191,7 @@
             dustCtx.fillStyle = 'rgba(255, 255, 255, 0.4)';
             particles.forEach(p => {
                 p.x += p.speedX; p.y += p.speedY;
-                if (p.y < 0) p.y = dustCanvas.height; // Si sale por arriba, aparece abajo
+                if (p.y < 0) p.y = dustCanvas.height; 
                 if (p.x < 0) p.x = dustCanvas.width;
                 if (p.x > dustCanvas.width) p.x = 0;
                 dustCtx.beginPath();
@@ -215,7 +215,7 @@
         let isMonsterActive = false;
         let monsterPhase = 0;
         let monsterStunTime = 0;
-        let monsterEvadeTimer = 0;
+        let monsterCooldown = 0; // Cooldown de 100s en Habitación 7
 
         btnStart.addEventListener('click', () => {
             warningScreen.style.display = 'none'; gameContainer.style.display = 'block'; gameStarted = true;
@@ -256,8 +256,8 @@
             monsterPhase = 1;
             monsterStunTime = 20.0;
             
-            // Aparece inicialmente en el centro superior
             monsterContainer.style.display = 'block';
+            // Aparece inicialmente arriba en el centro de la escena
             monsterContainer.style.left = '50%';
             
             stunTimerContainer.style.display = 'block';
@@ -267,61 +267,52 @@
         function updateMonsterLogic() {
             if (!isMonsterActive) return;
 
-            // 1. Detectar si la linterna le está apuntando
+            // Detección exacta basada en coordenadas globales de pantalla
             let rect = monsterSprite.getBoundingClientRect();
-            // Calculamos el centro exacto del cuadrado rojo en pantalla
             let centerX = rect.left + rect.width / 2;
             let centerY = rect.top + rect.height / 2;
-            
-            // Calculamos distancia entre el mouse (centro linterna) y el monstruo
             let distancia = Math.hypot(mouseX - centerX, mouseY - centerY);
-            
-            // Si la linterna está prendida y la luz lo toca (radio de unos 200px)
             let isIlluminated = (isFlashlightOn && distancia < 250);
             
             if (isIlluminated) {
                 monsterSprite.classList.add('tremble');
-                monsterStunTime -= 0.016; // Restamos tiempo (aprox 16ms por frame)
+                monsterStunTime -= 0.016; 
                 dbgLight.innerText = 'SÍ';
                 dbgLight.style.color = '#ff0000';
-
-                // Lógica de Evasión (Se mueve para esquivar la luz)
-                monsterEvadeTimer += 0.016;
-                if (monsterEvadeTimer > 1.2) { // Cada ~1.2 segundos siendo alumbrado, intenta moverse
-                    let randomPos = Math.floor(Math.random() * 60) + 20; // Entre 20% y 80% de la pantalla
-                    monsterContainer.style.left = `${randomPos}%`;
-                    monsterEvadeTimer = 0;
-                }
             } else {
                 monsterSprite.classList.remove('tremble');
                 dbgLight.innerText = 'NO';
                 dbgLight.style.color = '#00ff00';
             }
 
-            // Actualizar HUD de Stun y Debug
             let pct = Math.max(0, (monsterStunTime / 20) * 100);
             stunTimerFill.style.width = `${pct}%`;
             
             dbgPhase.innerText = monsterPhase;
             dbgStun.innerText = Math.max(0, monsterStunTime).toFixed(1);
 
-            // Transición de Fases
             if (monsterStunTime <= 0) {
                 if (monsterPhase === 1) {
-                    // Pasa a Fase 2, se resetea y cambia de posición drásticamente
+                    // Pasa a Fase 2: Aleatoriamente en el lado Este o Oeste de la habitación 7
                     monsterPhase = 2;
                     monsterStunTime = 20.0;
-                    monsterEvadeTimer = 0;
-                    let rotatePos = Math.random() > 0.5 ? '20%' : '80%';
-                    monsterContainer.style.left = rotatePos;
-                    // Aquí podrías rotarlo en el futuro (ej. asomado de lado)
+                    
+                    // Elegir aleatoriamente entre lado Este (ej. 75%) u Oeste (ej. 25%)
+                    let randomSide = Math.random() < 0.5 ? '25%' : '75%';
+                    monsterContainer.style.left = randomSide;
+                    
                 } else if (monsterPhase === 2) {
-                    // Derrotado / Sobreviviste
+                    // Derrotado por completo
                     isMonsterActive = false;
                     monsterContainer.style.display = 'none';
                     stunTimerContainer.style.display = 'none';
                     monsterSprite.classList.remove('tremble');
-                    dbgStatus.innerText = 'Se fue';
+                    dbgStatus.innerText = 'Derrotado (Cooldown act)';
+                    
+                    // Activar Cooldown de 100 segundos si se encuentra en Habitación 7
+                    if (currentRoom === 'habitacion_7') {
+                        monsterCooldown = 100;
+                    }
                 }
             }
         }
@@ -331,7 +322,7 @@
             if (!gameStarted) return;
             time += 0.08; 
             
-            drawDust(); // Actualizar partículas de polvo
+            drawDust(); 
 
             if (!isMoving) {
                 currentPanX += panSpeed;
@@ -346,7 +337,14 @@
             batteryFill.style.width = `${Math.floor(battery / 2) * 2}%`;
             batteryFill.style.backgroundColor = battery <= 20 ? '#ff0000' : battery <= 50 ? '#ffff00' : '#00ff00';
             
-            updateMonsterLogic(); // Revisar lógica de 001.jar
+            // Reducir Cooldown si está activo
+            if (monsterCooldown > 0) {
+                monsterCooldown -= 0.016; // Aprox 1 segundo por cada ~60 frames
+                if (monsterCooldown < 0) monsterCooldown = 0;
+            }
+            dbgCd.innerText = Math.ceil(monsterCooldown);
+
+            updateMonsterLogic(); 
 
             requestAnimationFrame(update);
         }
@@ -361,10 +359,16 @@
                 btnForward.style.display = 'none'; 
                 sfxOn.currentTime = 0; sfxOn.play(); 
                 
-                // --- DISPARADOR DE 001.jar ---
+                // --- DISPARADOR DE 001.jar con validación de Cooldown y Habitación 7 ---
+                let canAttack = true;
+                if (currentRoom === 'habitacion_7' && monsterCooldown > 0) {
+                    canAttack = false; // Está en cooldown
+                }
+
                 let chance = Math.floor(Math.random() * 3); // 0, 1, o 2
                 dbgRoll.innerText = chance;
-                if (chance === 2 && !isMonsterActive) {
+
+                if (canAttack && chance === 2 && !isMonsterActive) {
                     triggerMonster();
                 }
 
