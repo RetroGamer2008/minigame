@@ -24,17 +24,18 @@
             transition: transform 0.25s ease-in; /* Animación de caída */
         }
 
-        /* HITBOX CORREGIDA: Ajustada exactamente al lado izquierdo y un poco más amplia */
+        /* HITBOX CON BORDE ROJO VISIBLE PARA QUE LA VEAS SÍ O SÍ */
         #door-hitbox { 
             position: absolute; 
             top: 35%; 
-            left: 10%; 
-            width: 15%; 
-            height: 30%; 
+            left: 20%; 
+            width: 25%; 
+            height: 35%; 
             cursor: pointer; 
             display: none; 
-            z-index: 8; 
-            background: transparent; 
+            z-index: 99; /* Súper arriba para que nada la tape */
+            background: rgba(255, 0, 0, 0.4); /* Rojo semitransparente visible */
+            border: 3px solid yellow; /* Borde amarillo para destacarla */
         }
 
         /* CAPA DE OSCURIDAD */
