@@ -125,7 +125,7 @@
         Posición Arriba: <input type="number" id="inp-top" value="-5" class="adj-input">%<br>
         Fondo Escala: <input type="number" id="inp-bg-size" value="100" class="adj-input">%<br>
         Fondo Pos X: <input type="number" id="inp-bg-x" value="50" class="adj-input">%<br>
-        Fondo Pos Y: <input type="number" id="inp-bg-y" value="50" class="adj-input">%
+        Fondo Pos Y: <input type="number" id="inp-bg-y" value="30" class="adj-input">%
     </div>
 
     <div id="game-container">
@@ -387,7 +387,6 @@
                 let canAttack = true;
                 if (currentRoom === 'habitacion_7' && monsterCooldown > 0) { canAttack = false; }
 
-                // ¡AQUÍ ESTÁ EL CAMBIO A 50/50!
                 let chance = Math.floor(Math.random() * 2); 
                 dbgRoll.innerText = chance; 
                 console.log("Probabilidad 50/50 calculada al cerrar puerta:", chance);
