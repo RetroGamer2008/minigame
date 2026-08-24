@@ -30,10 +30,18 @@
         /* EFECTO POLVO AMBIENTAL */
         #dust-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3; pointer-events: none; opacity: 0.6; }
 
-        /* MONSTRUO 001_jar (Transición suave para simular el deslizamiento tipo FNaC 3) */
-        #monster-container { position: absolute; top: 38%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
-        .monster-sprite { width: 120px; height: 120px; background-color: red; box-shadow: 0 0 20px darkred; border: 3px solid black; }
-        /* Animación de temblor cuando es alumbrado */
+        /* MONSTRUO 001_jar */
+        #monster-container { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .monster-sprite { 
+            width: 300px; 
+            height: 400px; 
+            background-color: transparent; /* Quitamos el rojo */
+            background-image: url('001jar_monster.png');
+            background-repeat: no-repeat;
+            background-size: 100%;
+            background-position: 50% 50%;
+            border: 2px dashed #00ff00; /* Hitbox Visible */
+        }
         .tremble { animation: shake 0.1s infinite; }
         @keyframes shake {
             0% { transform: translate(2px, 2px) rotate(1deg); }
@@ -49,7 +57,11 @@
 
         /* PANELERÍA DEBUG */
         #debug-panel { position: absolute; top: 10px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #0f0; color: #0f0; padding: 10px; z-index: 9999; font-size: 12px; pointer-events: none; width: 220px; }
-        #debug-hitbox-panel { position: absolute; top: 180px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #ff0; color: #ff0; padding: 10px; z-index: 9999; font-size: 11px; pointer-events: none; width: 220px; }
+        #debug-hitbox-panel { position: absolute; top: 160px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #ff0; color: #ff0; padding: 10px; z-index: 9999; font-size: 11px; pointer-events: none; width: 220px; }
+        
+        /* TERCER PANEL: AJUSTE DE HITBOX E IMAGEN */
+        #debug-adjust-panel { position: absolute; top: 270px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #0ff; color: #0ff; padding: 10px; z-index: 9999; font-size: 11px; width: 220px; pointer-events: auto; }
+        .adj-input { background: #111; border: 1px solid #0ff; color: #0ff; width: 50px; font-size: 11px; margin-bottom: 4px; padding: 2px; }
 
         /* INTERFAZ DE USUARIO (UI) */
         #ui-layer { position: absolute; bottom: 30px; right: 40px; z-index: 50; display: flex; align-items: center; gap: 15px; opacity: 0.8; }
@@ -103,12 +115,23 @@
         Iluminado: <span id="dbg-light">NO</span>
     </div>
 
-    <!-- NUEVO PANEL DEBUG PARA HITBOX -->
+    <!-- PANEL DEBUG PARA HITBOX -->
     <div id="debug-hitbox-panel">
         <b>[ HITBOX MONITOR ]</b><br>
         X (Left): <span id="dbg-hx">0</span>px<br>
         Y (Top): <span id="dbg-hy">0</span>px<br>
         Distancia Luz: <span id="dbg-hdist">0</span>px
+    </div>
+
+    <!-- NUEVO PANEL DE AJUSTE (TERCERA VENTANA) -->
+    <div id="debug-adjust-panel">
+        <b>[ AJUSTE MONSTRUO ]</b><br><br>
+        Hitbox Ancho: <input type="number" id="inp-w" value="300" class="adj-input">px<br>
+        Hitbox Alto: <input type="number" id="inp-h" value="400" class="adj-input">px<br>
+        Posición Arriba: <input type="number" id="inp-top" value="15" class="adj-input">%<br>
+        Fondo Escala: <input type="number" id="inp-bg-size" value="100" class="adj-input">%<br>
+        Fondo Pos X: <input type="number" id="inp-bg-x" value="50" class="adj-input">%<br>
+        Fondo Pos Y: <input type="number" id="inp-bg-y" value="50" class="adj-input">%
     </div>
 
     <!-- JUEGO PRINCIPAL -->
@@ -173,9 +196,24 @@
         
         const dbgRoll = document.getElementById('dbg-roll'), dbgStatus = document.getElementById('dbg-status');
         const dbgPhase = document.getElementById('dbg-phase'), dbgStun = document.getElementById('dbg-stun'), dbgCd = document.getElementById('dbg-cd'), dbgLight = document.getElementById('dbg-light');
-        
-        // Referencias del nuevo panel de Hitbox
         const dbgHx = document.getElementById('dbg-hx'), dbgHy = document.getElementById('dbg-hy'), dbgHdist = document.getElementById('dbg-hdist');
+
+        // Referencias Nuevo Panel de Ajuste
+        const inpW = document.getElementById('inp-w'), inpH = document.getElementById('inp-h'), inpTop = document.getElementById('inp-top');
+        const inpBgSize = document.getElementById('inp-bg-size'), inpBgX = document.getElementById('inp-bg-x'), inpBgY = document.getElementById('inp-bg-y');
+
+        // Función para actualizar en vivo los ajustes del monstruo
+        function updateMonsterAdjustment() {
+            monsterSprite.style.width = inpW.value + 'px';
+            monsterSprite.style.height = inpH.value + 'px';
+            monsterContainer.style.top = inpTop.value + '%';
+            monsterSprite.style.backgroundSize = inpBgSize.value + '%';
+            monsterSprite.style.backgroundPosition = `${inpBgX.value}% ${inpBgY.value}%`;
+        }
+
+        [inpW, inpH, inpTop, inpBgSize, inpBgX, inpBgY].forEach(input => {
+            input.addEventListener('input', updateMonsterAdjustment);
+        });
 
         // --- SISTEMA DE POLVO ---
         const dustCanvas = document.getElementById('dust-canvas');
@@ -230,7 +268,7 @@
 
         btnStart.addEventListener('click', () => {
             warningScreen.style.display = 'none'; gameContainer.style.display = 'block'; gameStarted = true;
-            initDust(); updateView(); update();     
+            initDust(); updateView(); updateMonsterAdjustment(); update();     
         });
 
         window.addEventListener('mousemove', (e) => {
@@ -247,6 +285,9 @@
 
         window.addEventListener('keydown', (e) => {
             if (!gameStarted) return;
+            // No interactuamos con 'f' si el usuario está escribiendo en el panel
+            if (e.target.tagName === 'INPUT') return; 
+
             if (e.key.toLowerCase() === 'f' && !isMoving) {
                 if (battery > 0) {
                     isFlashlightOn = !isFlashlightOn;
@@ -269,8 +310,16 @@
             monsterEvadeTimer = 0;
             
             monsterContainer.style.display = 'block';
-            monsterContainer.style.left = '50%'; // Centro inicial parte superior
             
+            // FASE 1: Dependiendo de dónde esté mirando el jugador
+            if (mouseX < window.innerWidth * 0.4) {
+                monsterContainer.style.left = '35%'; 
+            } else if (mouseX > window.innerWidth * 0.6) {
+                monsterContainer.style.left = '65%'; 
+            } else {
+                monsterContainer.style.left = '50%'; 
+            }
+
             stunTimerContainer.style.display = 'block';
             dbgStatus.innerText = 'Atacando (Fase 1)';
         }
@@ -283,7 +332,6 @@
             let centerY = rect.top + rect.height / 2;
             let distancia = Math.hypot(mouseX - centerX, mouseY - centerY);
 
-            // Actualizar datos en el nuevo panel de Hitbox
             dbgHx.innerText = Math.round(centerX);
             dbgHy.innerText = Math.round(centerY);
             dbgHdist.innerText = Math.round(distancia);
@@ -296,10 +344,8 @@
                 dbgLight.innerText = 'SÍ';
                 dbgLight.style.color = '#ff0000';
 
-                // CORRECCIÓN: Comportamiento de evasión estilo FNaC 3 (deslizarse para evitar la luz)
                 monsterEvadeTimer += 0.016;
-                if (monsterEvadeTimer > 0.8) { // Cada 0.8 segundos intentará buscar un nuevo carril para huir
-                    // Elige aleatoriamente desplazarse hacia la izquierda o derecha de la pantalla actual
+                if (monsterEvadeTimer > 0.8) { 
                     let evasionOffsets = ['25%', '40%', '60%', '75%'];
                     let randomSpot = evasionOffsets[Math.floor(Math.random() * evasionOffsets.length)];
                     monsterContainer.style.left = randomSpot;
@@ -323,9 +369,13 @@
                     monsterStunTime = 20.0;
                     monsterEvadeTimer = 0;
                     
-                    // Ataque aleatorio secundario: Lado Este (ej. 75%) u Oeste (ej. 25%)
-                    let randomSide = Math.random() < 0.5 ? '25%' : '75%';
-                    monsterContainer.style.left = randomSide;
+                    // FASE 2: Dependiendo de dónde esté mirando el jugador
+                    if (mouseX < window.innerWidth * 0.5) {
+                        monsterContainer.style.left = '25%'; 
+                    } else {
+                        monsterContainer.style.left = '75%'; 
+                    }
+
                     dbgStatus.innerText = 'Atacando (Fase 2)';
                     
                 } else if (monsterPhase === 2) {
@@ -336,7 +386,7 @@
                     dbgStatus.innerText = 'Derrotado (Cooldown)';
                     
                     if (currentRoom === 'habitacion_7') {
-                        monsterCooldown = 100; // Cooldown de 100s en Habitación 7
+                        monsterCooldown = 100; 
                     }
                 }
             }
@@ -476,6 +526,7 @@
 
         function updateView() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
+            
             if (wallData && wallData.hasDoor) {
                 doorHitbox.style.display = 'block';
                 if (isDoorClosed) { office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`; btnForward.style.display = 'none'; } 
@@ -491,13 +542,35 @@
         btnLeft.addEventListener('click', () => {
             if (!gameStarted || isMoving) return;
             isMoving = true; transitionOverlay.style.opacity = '1';
-            setTimeout(() => { currentFacing = (currentFacing - 1 + 4) % 4; updateView(); setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100); }, 150);
+            
+            if (isMonsterActive) monsterContainer.style.display = 'none';
+
+            setTimeout(() => { 
+                currentFacing = (currentFacing - 1 + 4) % 4; 
+                updateView(); 
+                setTimeout(() => { 
+                    transitionOverlay.style.opacity = '0'; 
+                    isMoving = false; 
+                    if (isMonsterActive) monsterContainer.style.display = 'block';
+                }, 100); 
+            }, 150);
         });
 
         btnRight.addEventListener('click', () => {
             if (!gameStarted || isMoving) return;
             isMoving = true; transitionOverlay.style.opacity = '1';
-            setTimeout(() => { currentFacing = (currentFacing + 1) % 4; updateView(); setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100); }, 150);
+            
+            if (isMonsterActive) monsterContainer.style.display = 'none';
+
+            setTimeout(() => { 
+                currentFacing = (currentFacing + 1) % 4; 
+                updateView(); 
+                setTimeout(() => { 
+                    transitionOverlay.style.opacity = '0'; 
+                    isMoving = false; 
+                    if (isMonsterActive) monsterContainer.style.display = 'block';
+                }, 100); 
+            }, 150);
         });
 
         btnForward.addEventListener('click', () => {
