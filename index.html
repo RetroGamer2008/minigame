@@ -100,7 +100,7 @@
         <button id="btn-start">EMPEZAR</button>
     </div>
 
-    <!-- PANELES DE DEBUG (NO SE BORRÓ NINGUNO) -->
+    <!-- PANELES DE DEBUG -->
     <div id="debug-panel">
         <b>[ 001.jar STATS ]</b><br>
         Tirada Puerta: <span id="dbg-roll">N/A</span><br>
@@ -387,11 +387,12 @@
                 let canAttack = true;
                 if (currentRoom === 'habitacion_7' && monsterCooldown > 0) { canAttack = false; }
 
-                let chance = Math.floor(Math.random() * 3); 
+                // ¡AQUÍ ESTÁ EL CAMBIO A 50/50!
+                let chance = Math.floor(Math.random() * 2); 
                 dbgRoll.innerText = chance; 
-                console.log("Probabilidad calculada al cerrar puerta:", chance);
+                console.log("Probabilidad 50/50 calculada al cerrar puerta:", chance);
 
-                if (canAttack && chance === 2 && !isMonsterActive) {
+                if (canAttack && chance === 1 && !isMonsterActive) {
                     triggerMonster();
                 }
 
