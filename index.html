@@ -240,7 +240,19 @@
         let monsterStunTime = 0;
         let monsterCooldown = 0;
         let monsterEvadeTimer = 0;
-        let monsterRestTimer = 0; // Descanso de 10 segundos entre fases
+        let monsterRestTimer = 0; 
+
+        // NUEVO: Bolsa de números disponibles (0 al 2) sin reposición para evitar que nunca aparezca
+        let availableNumbers = [0, 1, 2];
+
+        function getRandomNumberWithoutReplacement() {
+            if (availableNumbers.length === 0) {
+                availableNumbers = [0, 1, 2]; // Se reintegra si por alguna razón se vacía
+            }
+            let randomIndex = Math.floor(Math.random() * availableNumbers.length);
+            let chosenNumber = availableNumbers.splice(randomIndex, 1)[0];
+            return chosenNumber;
+        }
 
         btnStart.addEventListener('click', () => {
             warningScreen.style.display = 'none'; gameContainer.style.display = 'block'; gameStarted = true;
@@ -294,7 +306,6 @@
         function updateMonsterLogic() {
             if (!isMonsterActive) return;
 
-            // Si está en el descanso de 10 segundos entre la Fase 1 y la Fase 2
             if (monsterPhase === 1.5) {
                 monsterRestTimer -= 0.016;
                 monsterContainer.style.display = 'none';
@@ -334,7 +345,6 @@
                 dbgLight.style.color = '#ff0000';
 
                 monsterEvadeTimer += 0.016;
-                // Umbral de evasión más rápido en fase 2 (0.4s en vez de 0.8s)
                 let evadeThreshold = (monsterPhase === 2) ? 0.4 : 0.8;
                 
                 if (monsterEvadeTimer > evadeThreshold) { 
@@ -357,7 +367,6 @@
 
             if (monsterStunTime <= 0) {
                 if (monsterPhase === 1) {
-                    // Entra en descanso de 10 segundos antes de la Fase 2
                     monsterPhase = 1.5;
                     monsterRestTimer = 10.0;
                     monsterSprite.classList.remove('tremble');
@@ -368,6 +377,9 @@
                     monsterSprite.classList.remove('tremble');
                     dbgStatus.innerText = 'Derrotado (Cooldown)';
                     
+                    // REINTEGRAR NÚMEROS: Cuando 001.jar es totalmente derrotado, se vuelve a llenar la bolsa de probabilidad
+                    availableNumbers = [0, 1, 2];
+
                     if (currentRoom === 'habitacion_7') { monsterCooldown = 100; }
                 }
             }
@@ -410,11 +422,13 @@
                 let canAttack = true;
                 if (currentRoom === 'habitacion_7' && monsterCooldown > 0) { canAttack = false; }
 
-                let chance = Math.floor(Math.random() * 2); 
-                dbgRoll.innerText = chance; 
-                console.log("Probabilidad 50/50 calculada al cerrar puerta:", chance);
+                // NUEVO: Obtenemos número del 0 al 2 sin reposición
+                let roll = getRandomNumberWithoutReplacement();
+                dbgRoll.innerText = `${roll} (Restantes: [${availableNumbers.join(',')}])`; 
+                console.log("Número sacado:", roll, "Números restantes en la bolsa:", availableNumbers);
 
-                if (canAttack && chance === 1 && !isMonsterActive) {
+                // Si sale 2, ataca. Si sale 0 o 1, no atacará (pero ya quedan descartados para la próxima)
+                if (canAttack && roll === 2 && !isMonsterActive) {
                     triggerMonster();
                 }
 
