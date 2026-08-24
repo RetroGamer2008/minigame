@@ -240,6 +240,7 @@
         let monsterStunTime = 0;
         let monsterCooldown = 0;
         let monsterEvadeTimer = 0;
+        let monsterRestTimer = 0; // Descanso de 10 segundos entre fases
 
         btnStart.addEventListener('click', () => {
             warningScreen.style.display = 'none'; gameContainer.style.display = 'block'; gameStarted = true;
@@ -279,6 +280,7 @@
             monsterPhase = 1;
             monsterStunTime = 6.0; 
             monsterEvadeTimer = 0;
+            monsterRestTimer = 0;
             monsterContainer.style.display = 'block';
             
             if (mouseX < window.innerWidth * 0.4) { monsterContainer.style.left = '35%'; } 
@@ -291,6 +293,28 @@
 
         function updateMonsterLogic() {
             if (!isMonsterActive) return;
+
+            // Si está en el descanso de 10 segundos entre la Fase 1 y la Fase 2
+            if (monsterPhase === 1.5) {
+                monsterRestTimer -= 0.016;
+                monsterContainer.style.display = 'none';
+                stunTimerContainer.style.display = 'none';
+                dbgStatus.innerText = `Descanso Fase 2 (${Math.ceil(monsterRestTimer)}s)`;
+                dbgPhase.innerText = '1.5 (Descanso)';
+                dbgStun.innerText = '0.0';
+
+                if (monsterRestTimer <= 0) {
+                    monsterPhase = 2;
+                    monsterStunTime = 6.0;
+                    monsterEvadeTimer = 0;
+                    monsterContainer.style.display = 'block';
+                    stunTimerContainer.style.display = 'block';
+                    if (mouseX < window.innerWidth * 0.5) { monsterContainer.style.left = '25%'; } 
+                    else { monsterContainer.style.left = '75%'; }
+                    dbgStatus.innerText = 'Atacando (Fase 2 - Rápida)';
+                }
+                return;
+            }
 
             let rect = monsterSprite.getBoundingClientRect();
             let centerX = rect.left + rect.width / 2;
@@ -310,7 +334,10 @@
                 dbgLight.style.color = '#ff0000';
 
                 monsterEvadeTimer += 0.016;
-                if (monsterEvadeTimer > 0.8) { 
+                // Umbral de evasión más rápido en fase 2 (0.4s en vez de 0.8s)
+                let evadeThreshold = (monsterPhase === 2) ? 0.4 : 0.8;
+                
+                if (monsterEvadeTimer > evadeThreshold) { 
                     let evasionOffsets = ['25%', '40%', '60%', '75%'];
                     let randomSpot = evasionOffsets[Math.floor(Math.random() * evasionOffsets.length)];
                     monsterContainer.style.left = randomSpot;
@@ -330,14 +357,10 @@
 
             if (monsterStunTime <= 0) {
                 if (monsterPhase === 1) {
-                    monsterPhase = 2;
-                    monsterStunTime = 6.0; 
-                    monsterEvadeTimer = 0;
-                    
-                    if (mouseX < window.innerWidth * 0.5) { monsterContainer.style.left = '25%'; } 
-                    else { monsterContainer.style.left = '75%'; }
-
-                    dbgStatus.innerText = 'Atacando (Fase 2)';
+                    // Entra en descanso de 10 segundos antes de la Fase 2
+                    monsterPhase = 1.5;
+                    monsterRestTimer = 10.0;
+                    monsterSprite.classList.remove('tremble');
                 } else if (monsterPhase === 2) {
                     isMonsterActive = false;
                     monsterContainer.style.display = 'none';
