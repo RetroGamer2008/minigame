@@ -21,7 +21,7 @@
         #game-container { position: relative; width: 100vw; height: 100vh; perspective: 600px; transform-style: preserve-3d; overflow: hidden; display: none; }
 
         /* IMAGEN DE LA OFICINA / HABITACIÓN */
-        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; transform-style: preserve-3d; }
+        #office { position: absolute; top: -10%; left: -10%; width: 180vw; height: 120vh; background-image: url('Habitacion_Cuarto_1 puerta abierta sin puerta.png'); background-size: cover; background-position: center; transform-origin: 50% 50%; will-change: transform; transition: background-image 0.1s ease; transform-style: preserve-3d; z-index: 1; }
 
         /* CAPA Y HITBOX DE LA PUERTA */
         #door-overlay { position: absolute; top: 0; left: 30%; width: 40%; height: 100%; background-size: cover; background-position: center; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.2s ease-in; }
@@ -31,7 +31,7 @@
         #dust-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3; pointer-events: none; opacity: 0.6; }
 
         /* MONSTRUO 001_jar */
-        #monster-container { position: absolute; top: -5%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        #monster-container { position: absolute; top: -5%; left: 50%; transform: translateX(-50%); z-index: 5; display: none; transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
         .monster-sprite { 
             width: 700px; 
             height: 900px; 
@@ -40,7 +40,7 @@
             background-repeat: no-repeat;
             background-size: 100%;
             background-position: 50% 50%;
-            border: 2px dashed #00ff00; /* Hitbox Visible */
+            border: 2px dashed #00ff00;
         }
         .tremble { animation: shake 0.1s infinite; }
         @keyframes shake {
@@ -58,8 +58,6 @@
         /* PANELERÍA DEBUG */
         #debug-panel { position: absolute; top: 10px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #0f0; color: #0f0; padding: 10px; z-index: 9999; font-size: 12px; pointer-events: none; width: 220px; }
         #debug-hitbox-panel { position: absolute; top: 160px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #ff0; color: #ff0; padding: 10px; z-index: 9999; font-size: 11px; pointer-events: none; width: 220px; }
-        
-        /* TERCER PANEL: AJUSTE DE HITBOX E IMAGEN */
         #debug-adjust-panel { position: absolute; top: 270px; right: 260px; background: rgba(0,0,0,0.85); border: 1px solid #0ff; color: #0ff; padding: 10px; z-index: 9999; font-size: 11px; width: 220px; pointer-events: auto; }
         .adj-input { background: #111; border: 1px solid #0ff; color: #0ff; width: 50px; font-size: 11px; margin-bottom: 4px; padding: 2px; }
 
@@ -79,7 +77,7 @@
         #stun-timer-fill { width: 100%; height: 100%; background-color: #ff4444; }
         #stun-timer-text { position: absolute; width: 100%; text-align: center; top: 2px; left: 0; font-size: 1rem; text-shadow: 1px 1px 0 #000; pointer-events: none; }
 
-        /* MINIMAPA (12 FPS RETRO) */
+        /* MINIMAPA */
         #minimap-container { position: absolute; top: 20px; left: 20px; width: 220px; height: 220px; border: 2px solid #444; z-index: 50; background-color: rgba(0, 0, 0, 0.9); overflow: hidden; }
         #minimap-canvas { position: absolute; top: 0; left: 0; transition: transform 0.8s steps(10, end); }
         #player-arrow { position: absolute; width: 10px; height: 10px; background-color: white; border-radius: 50%; top: 50%; left: 50%; margin-top: -3px; margin-left: -5px; transition: transform 0.2s steps(3, end); transform-origin: center; z-index: 55; box-shadow: 0 0 4px white; }
@@ -94,8 +92,6 @@
     </style>
 </head>
 <body>
-
-    <!-- PANTALLA DE ADVERTENCIA -->
     <div id="warning-screen">
         <h1>¡ADVERTENCIA!</h1>
         <p>Este juego contiene <b>sustos repentinos (jumpscares)</b> y ruidos fuertes.<br><br>
@@ -104,7 +100,7 @@
         <button id="btn-start">EMPEZAR</button>
     </div>
 
-    <!-- PANEL DEBUG PRINCIPAL -->
+    <!-- PANELES DE DEBUG (NO SE BORRÓ NINGUNO) -->
     <div id="debug-panel">
         <b>[ 001.jar STATS ]</b><br>
         Tirada Puerta: <span id="dbg-roll">N/A</span><br>
@@ -115,7 +111,6 @@
         Iluminado: <span id="dbg-light">NO</span>
     </div>
 
-    <!-- PANEL DEBUG PARA HITBOX -->
     <div id="debug-hitbox-panel">
         <b>[ HITBOX MONITOR ]</b><br>
         X (Left): <span id="dbg-hx">0</span>px<br>
@@ -123,7 +118,6 @@
         Distancia Luz: <span id="dbg-hdist">0</span>px
     </div>
 
-    <!-- NUEVO PANEL DE AJUSTE (TERCERA VENTANA) -->
     <div id="debug-adjust-panel">
         <b>[ AJUSTE MONSTRUO ]</b><br><br>
         Hitbox Ancho: <input type="number" id="inp-w" value="700" class="adj-input">px<br>
@@ -134,9 +128,7 @@
         Fondo Pos Y: <input type="number" id="inp-bg-y" value="50" class="adj-input">%
     </div>
 
-    <!-- JUEGO PRINCIPAL -->
     <div id="game-container">
-        <!-- ESCENARIO PRINCIPAL -->
         <div id="office">
             <div id="door-overlay"></div>
             <div id="door-hitbox" onclick="toggleDoor()"></div>
@@ -152,12 +144,8 @@
         <div id="flashlight-layer"></div>
         <div id="shader-lens"></div>
         <div id="transition-overlay"></div>
-
         <div id="instructions">Presiona 'F' para usar la linterna</div>
-        
         <div id="door-timer-container"><div id="door-timer-fill"></div><div id="door-timer-text">Cerrada (Bloqueada)</div></div>
-        
-        <!-- BARRA DE STUN DEL MONSTRUO -->
         <div id="stun-timer-container"><div id="stun-timer-fill" id="stun-fill"></div><div id="stun-timer-text">Aturde a 001.jar</div></div>
 
         <div id="ui-layer">
@@ -176,14 +164,12 @@
     </div>
 
     <script>
-        // --- SONIDOS ---
         const sfxOn = new Audio('https://actions.google.com/sounds/v1/foley/cassette_tape_button.ogg');
         const sfxOff = new Audio('https://actions.google.com/sounds/v1/foley/cassette_tape_button.ogg'); sfxOff.playbackRate = 0.8;
         const sfxBroken = new Audio('https://actions.google.com/sounds/v1/science_fiction/spark.ogg');
         const sfxStep = new Audio('https://actions.google.com/sounds/v1/foley/footstep_single_hard_surface.ogg'); 
         sfxOn.volume = 0.6; sfxOff.volume = 0.6; sfxBroken.volume = 0.5; sfxStep.volume = 0.7;
 
-        // --- REFERENCIAS DOM ---
         const warningScreen = document.getElementById('warning-screen'), gameContainer = document.getElementById('game-container'), btnStart = document.getElementById('btn-start');
         const office = document.getElementById('office'), darknessLayer = document.getElementById('darkness-layer'), flashlightLayer = document.getElementById('flashlight-layer');
         const batteryFill = document.getElementById('battery-fill'), doorHitbox = document.getElementById('door-hitbox'), btnForward = document.getElementById('btn-forward');
@@ -198,11 +184,9 @@
         const dbgPhase = document.getElementById('dbg-phase'), dbgStun = document.getElementById('dbg-stun'), dbgCd = document.getElementById('dbg-cd'), dbgLight = document.getElementById('dbg-light');
         const dbgHx = document.getElementById('dbg-hx'), dbgHy = document.getElementById('dbg-hy'), dbgHdist = document.getElementById('dbg-hdist');
 
-        // Referencias Nuevo Panel de Ajuste
         const inpW = document.getElementById('inp-w'), inpH = document.getElementById('inp-h'), inpTop = document.getElementById('inp-top');
         const inpBgSize = document.getElementById('inp-bg-size'), inpBgX = document.getElementById('inp-bg-x'), inpBgY = document.getElementById('inp-bg-y');
 
-        // Función para actualizar en vivo los ajustes del monstruo
         function updateMonsterAdjustment() {
             monsterSprite.style.width = inpW.value + 'px';
             monsterSprite.style.height = inpH.value + 'px';
@@ -215,7 +199,6 @@
             input.addEventListener('input', updateMonsterAdjustment);
         });
 
-        // --- SISTEMA DE POLVO ---
         const dustCanvas = document.getElementById('dust-canvas');
         const dustCtx = dustCanvas.getContext('2d');
         let particles = [];
@@ -224,13 +207,7 @@
             dustCanvas.width = window.innerWidth * 1.8;
             dustCanvas.height = window.innerHeight * 1.2;
             for(let i = 0; i < 40; i++) { 
-                particles.push({
-                    x: Math.random() * dustCanvas.width,
-                    y: Math.random() * dustCanvas.height,
-                    size: Math.random() * 2 + 1,
-                    speedX: (Math.random() - 0.5) * 0.4,
-                    speedY: (Math.random() - 1) * 0.6 
-                });
+                particles.push({ x: Math.random() * dustCanvas.width, y: Math.random() * dustCanvas.height, size: Math.random() * 2 + 1, speedX: (Math.random() - 0.5) * 0.4, speedY: (Math.random() - 1) * 0.6 });
             }
         }
 
@@ -248,7 +225,6 @@
             });
         }
 
-        // --- MINIMAPA ---
         const mapCanvas = document.getElementById('minimap-canvas'), mapCtx = mapCanvas.getContext('2d');
         const discoveredRooms = new Set(['habitacion_1']); 
         const mapCellSize = 35, mapCanvasCenterX = mapCanvas.width / 2, mapCanvasCenterY = mapCanvas.height / 2;
@@ -259,7 +235,6 @@
         
         let isDoorClosed = false, doorInterval = null, doorTimeRemaining = 0, maxDoorTime = 120; 
 
-        // --- VARIABLES DEL MONSTRUO ---
         let isMonsterActive = false;
         let monsterPhase = 0;
         let monsterStunTime = 0;
@@ -284,10 +259,7 @@
         });
 
         window.addEventListener('keydown', (e) => {
-            if (!gameStarted) return;
-            // No interactuamos con 'f' si el usuario está escribiendo en el panel
-            if (e.target.tagName === 'INPUT') return; 
-
+            if (!gameStarted || e.target.tagName === 'INPUT') return; 
             if (e.key.toLowerCase() === 'f' && !isMoving) {
                 if (battery > 0) {
                     isFlashlightOn = !isFlashlightOn;
@@ -302,23 +274,16 @@
             flashlightLayer.style.opacity = isFlashlightOn ? '1' : '0';
         }
 
-        // --- LÓGICA DEL MONSTRUO ---
         function triggerMonster() {
             isMonsterActive = true;
             monsterPhase = 1;
-            monsterStunTime = 6.0; // Reducido a 6 segundos
+            monsterStunTime = 6.0; 
             monsterEvadeTimer = 0;
-            
             monsterContainer.style.display = 'block';
             
-            // FASE 1: Dependiendo de dónde esté mirando el jugador
-            if (mouseX < window.innerWidth * 0.4) {
-                monsterContainer.style.left = '35%'; 
-            } else if (mouseX > window.innerWidth * 0.6) {
-                monsterContainer.style.left = '65%'; 
-            } else {
-                monsterContainer.style.left = '50%'; 
-            }
+            if (mouseX < window.innerWidth * 0.4) { monsterContainer.style.left = '35%'; } 
+            else if (mouseX > window.innerWidth * 0.6) { monsterContainer.style.left = '65%'; } 
+            else { monsterContainer.style.left = '50%'; }
 
             stunTimerContainer.style.display = 'block';
             dbgStatus.innerText = 'Atacando (Fase 1)';
@@ -336,7 +301,6 @@
             dbgHy.innerText = Math.round(centerY);
             dbgHdist.innerText = Math.round(distancia);
 
-            // Aumentamos levemente el radio de luz considerado para que sea más fácil aturdirlo ahora que es más grande
             let isIlluminated = (isFlashlightOn && distancia < 300);
             
             if (isIlluminated) {
@@ -358,7 +322,6 @@
                 dbgLight.style.color = '#00ff00';
             }
 
-            // Calculamos el porcentaje basado en 6 segundos
             let pct = Math.max(0, (monsterStunTime / 6.0) * 100);
             stunTimerFill.style.width = `${pct}%`;
             
@@ -368,18 +331,13 @@
             if (monsterStunTime <= 0) {
                 if (monsterPhase === 1) {
                     monsterPhase = 2;
-                    monsterStunTime = 6.0; // Reducido a 6 segundos para fase 2 también
+                    monsterStunTime = 6.0; 
                     monsterEvadeTimer = 0;
                     
-                    // FASE 2: Dependiendo de dónde esté mirando el jugador
-                    if (mouseX < window.innerWidth * 0.5) {
-                        monsterContainer.style.left = '25%'; 
-                    } else {
-                        monsterContainer.style.left = '75%'; 
-                    }
+                    if (mouseX < window.innerWidth * 0.5) { monsterContainer.style.left = '25%'; } 
+                    else { monsterContainer.style.left = '75%'; }
 
                     dbgStatus.innerText = 'Atacando (Fase 2)';
-                    
                 } else if (monsterPhase === 2) {
                     isMonsterActive = false;
                     monsterContainer.style.display = 'none';
@@ -387,14 +345,11 @@
                     monsterSprite.classList.remove('tremble');
                     dbgStatus.innerText = 'Derrotado (Cooldown)';
                     
-                    if (currentRoom === 'habitacion_7') {
-                        monsterCooldown = 100; 
-                    }
+                    if (currentRoom === 'habitacion_7') { monsterCooldown = 100; }
                 }
             }
         }
 
-        // BUCLE PRINCIPAL
         function update() {
             if (!gameStarted) return;
             time += 0.08; 
@@ -413,17 +368,13 @@
             batteryFill.style.width = `${Math.floor(battery / 2) * 2}%`;
             batteryFill.style.backgroundColor = battery <= 20 ? '#ff0000' : battery <= 50 ? '#ffff00' : '#00ff00';
             
-            if (monsterCooldown > 0) {
-                monsterCooldown -= 0.016; 
-                if (monsterCooldown < 0) monsterCooldown = 0;
-            }
+            if (monsterCooldown > 0) { monsterCooldown -= 0.016; if (monsterCooldown < 0) monsterCooldown = 0; }
             dbgCd.innerText = Math.ceil(monsterCooldown);
 
             updateMonsterLogic(); 
             requestAnimationFrame(update);
         }
 
-        // PUERTAS Y DISPARADOR
         function toggleDoor() {
             if (!gameStarted || isDoorClosed) return; 
             const wallData = mapa[currentRoom].paredes[currentFacing];
@@ -434,12 +385,11 @@
                 sfxOn.currentTime = 0; sfxOn.play(); 
                 
                 let canAttack = true;
-                if (currentRoom === 'habitacion_7' && monsterCooldown > 0) {
-                    canAttack = false; 
-                }
+                if (currentRoom === 'habitacion_7' && monsterCooldown > 0) { canAttack = false; }
 
                 let chance = Math.floor(Math.random() * 3); 
-                dbgRoll.innerText = chance;
+                dbgRoll.innerText = chance; 
+                console.log("Probabilidad calculada al cerrar puerta:", chance);
 
                 if (canAttack && chance === 2 && !isMonsterActive) {
                     triggerMonster();
@@ -528,7 +478,6 @@
 
         function updateView() {
             const wallData = mapa[currentRoom].paredes[currentFacing];
-            
             if (wallData && wallData.hasDoor) {
                 doorHitbox.style.display = 'block';
                 if (isDoorClosed) { office.style.backgroundImage = `url('Habitacion_Cuarto_1 puerta abierta_con_puertaON.png')`; btnForward.style.display = 'none'; } 
@@ -542,33 +491,15 @@
         }
 
         btnLeft.addEventListener('click', () => {
-            // Si el monstruo está atacando, se bloquea la rotación
             if (!gameStarted || isMoving || isMonsterActive) return;
             isMoving = true; transitionOverlay.style.opacity = '1';
-            
-            setTimeout(() => { 
-                currentFacing = (currentFacing - 1 + 4) % 4; 
-                updateView(); 
-                setTimeout(() => { 
-                    transitionOverlay.style.opacity = '0'; 
-                    isMoving = false; 
-                }, 100); 
-            }, 150);
+            setTimeout(() => { currentFacing = (currentFacing - 1 + 4) % 4; updateView(); setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100); }, 150);
         });
 
         btnRight.addEventListener('click', () => {
-            // Si el monstruo está atacando, se bloquea la rotación
             if (!gameStarted || isMoving || isMonsterActive) return;
             isMoving = true; transitionOverlay.style.opacity = '1';
-            
-            setTimeout(() => { 
-                currentFacing = (currentFacing + 1) % 4; 
-                updateView(); 
-                setTimeout(() => { 
-                    transitionOverlay.style.opacity = '0'; 
-                    isMoving = false; 
-                }, 100); 
-            }, 150);
+            setTimeout(() => { currentFacing = (currentFacing + 1) % 4; updateView(); setTimeout(() => { transitionOverlay.style.opacity = '0'; isMoving = false; }, 100); }, 150);
         });
 
         btnForward.addEventListener('click', () => {
@@ -579,7 +510,6 @@
                 office.style.transition = 'transform 0.6s ease-in';
                 office.style.transform = 'translate3d(0, 0, 0) scale(2.2) rotateY(0deg)';
                 currentRoom = wallData.link;
-                
                 setTimeout(() => {
                     transitionOverlay.style.opacity = '1';
                     setTimeout(() => {
