@@ -31,11 +31,11 @@
         #dust-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3; pointer-events: none; opacity: 0.6; }
 
         /* MONSTRUO 001_jar */
-        #monster-container { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        #monster-container { position: absolute; top: -5%; left: 50%; transform: translateX(-50%); z-index: 4; display: none; transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
         .monster-sprite { 
-            width: 300px; 
-            height: 400px; 
-            background-color: transparent; /* Quitamos el rojo */
+            width: 700px; 
+            height: 900px; 
+            background-color: transparent; 
             background-image: url('001jar_monster.png');
             background-repeat: no-repeat;
             background-size: 100%;
@@ -126,9 +126,9 @@
     <!-- NUEVO PANEL DE AJUSTE (TERCERA VENTANA) -->
     <div id="debug-adjust-panel">
         <b>[ AJUSTE MONSTRUO ]</b><br><br>
-        Hitbox Ancho: <input type="number" id="inp-w" value="300" class="adj-input">px<br>
-        Hitbox Alto: <input type="number" id="inp-h" value="400" class="adj-input">px<br>
-        Posición Arriba: <input type="number" id="inp-top" value="15" class="adj-input">%<br>
+        Hitbox Ancho: <input type="number" id="inp-w" value="700" class="adj-input">px<br>
+        Hitbox Alto: <input type="number" id="inp-h" value="900" class="adj-input">px<br>
+        Posición Arriba: <input type="number" id="inp-top" value="-5" class="adj-input">%<br>
         Fondo Escala: <input type="number" id="inp-bg-size" value="100" class="adj-input">%<br>
         Fondo Pos X: <input type="number" id="inp-bg-x" value="50" class="adj-input">%<br>
         Fondo Pos Y: <input type="number" id="inp-bg-y" value="50" class="adj-input">%
@@ -306,7 +306,7 @@
         function triggerMonster() {
             isMonsterActive = true;
             monsterPhase = 1;
-            monsterStunTime = 20.0;
+            monsterStunTime = 6.0; // Reducido a 6 segundos
             monsterEvadeTimer = 0;
             
             monsterContainer.style.display = 'block';
@@ -336,7 +336,8 @@
             dbgHy.innerText = Math.round(centerY);
             dbgHdist.innerText = Math.round(distancia);
 
-            let isIlluminated = (isFlashlightOn && distancia < 200);
+            // Aumentamos levemente el radio de luz considerado para que sea más fácil aturdirlo ahora que es más grande
+            let isIlluminated = (isFlashlightOn && distancia < 300);
             
             if (isIlluminated) {
                 monsterSprite.classList.add('tremble');
@@ -357,7 +358,8 @@
                 dbgLight.style.color = '#00ff00';
             }
 
-            let pct = Math.max(0, (monsterStunTime / 20) * 100);
+            // Calculamos el porcentaje basado en 6 segundos
+            let pct = Math.max(0, (monsterStunTime / 6.0) * 100);
             stunTimerFill.style.width = `${pct}%`;
             
             dbgPhase.innerText = monsterPhase;
@@ -366,7 +368,7 @@
             if (monsterStunTime <= 0) {
                 if (monsterPhase === 1) {
                     monsterPhase = 2;
-                    monsterStunTime = 20.0;
+                    monsterStunTime = 6.0; // Reducido a 6 segundos para fase 2 también
                     monsterEvadeTimer = 0;
                     
                     // FASE 2: Dependiendo de dónde esté mirando el jugador
@@ -540,35 +542,31 @@
         }
 
         btnLeft.addEventListener('click', () => {
-            if (!gameStarted || isMoving) return;
+            // Si el monstruo está atacando, se bloquea la rotación
+            if (!gameStarted || isMoving || isMonsterActive) return;
             isMoving = true; transitionOverlay.style.opacity = '1';
             
-            if (isMonsterActive) monsterContainer.style.display = 'none';
-
             setTimeout(() => { 
                 currentFacing = (currentFacing - 1 + 4) % 4; 
                 updateView(); 
                 setTimeout(() => { 
                     transitionOverlay.style.opacity = '0'; 
                     isMoving = false; 
-                    if (isMonsterActive) monsterContainer.style.display = 'block';
                 }, 100); 
             }, 150);
         });
 
         btnRight.addEventListener('click', () => {
-            if (!gameStarted || isMoving) return;
+            // Si el monstruo está atacando, se bloquea la rotación
+            if (!gameStarted || isMoving || isMonsterActive) return;
             isMoving = true; transitionOverlay.style.opacity = '1';
             
-            if (isMonsterActive) monsterContainer.style.display = 'none';
-
             setTimeout(() => { 
                 currentFacing = (currentFacing + 1) % 4; 
                 updateView(); 
                 setTimeout(() => { 
                     transitionOverlay.style.opacity = '0'; 
                     isMoving = false; 
-                    if (isMonsterActive) monsterContainer.style.display = 'block';
                 }, 100); 
             }, 150);
         });
