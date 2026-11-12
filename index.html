@@ -479,7 +479,7 @@
                     glitch();
                     showToast('001.jar se ha ido. Por ahora.', 4000);
                     availableNumbers = [0, 1, 2]; // se rellena la bolsa tras derrotarlo
-                    if (currentRoom === 'habitacion_7') monsterCooldown = 100;
+                    monsterCooldown = 100;
                     updateNavLocks();
                 }
             }
@@ -608,7 +608,7 @@
             btnForward.style.display = 'none';
             playSfx(sfxOn); shake();
 
-            const canAttack = !(currentRoom === 'habitacion_7' && monsterCooldown > 0);
+            const canAttack = monsterCooldown <= 0;
             const roll = getRandomNumberWithoutReplacement();
 
             if (canAttack && roll === 2 && !isMonsterActive && !monsterIncoming) {
@@ -637,7 +637,13 @@
         }
 
         /* =========================================================
-           MAPA
+           MAPA DEL LABERINTO
+           - SALAS: posición de cada habitación como [columna, fila],
+             igual que en tu dibujo (columna 0 = izquierda, fila 0 = arriba).
+           - PASILLOS: qué habitaciones están conectadas entre sí.
+           - La imagen de cada pared se elige SOLA según lo que se ve
+             al mirar en esa dirección (adelante, izquierda y derecha).
+           Para añadir una habitación: ponla en SALAS y conéctala en PASILLOS.
         ========================================================= */
         const imgPuertaSinPuerta = 'Habitacion_Cuarto_1 puerta abierta sin puerta.png';
         const imgCuartoCerrado = 'Habitacion_Cuarto_cerrado.png';
@@ -647,16 +653,92 @@
         const imgPuertaConPuertaOFF = 'Habitacion_Cuarto_1 puerta abierta_con_puertaOFF.png';
         const imgPuertaConPuertaON = 'Habitacion_Cuarto_1 puerta abierta_con_puertaON.png';
         const imgMesa1 = 'Habitacion con mesa 1.png';
+        const imgMesaFinal = 'Habitacion con mesa 2.png'; // la de la mesa + mueble; cambia el nombre si tu PNG se llama distinto
 
-        const mapa = {
-            'habitacion_1': { gridX: 0, gridY: 3, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
-            'habitacion_2': { gridX: 0, gridY: 2, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_3', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_1', hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
-            'habitacion_3': { gridX: 0, gridY: 1, paredes: [{ dir: 0, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgPuertaSinPuerta, link: 'habitacion_2', hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] },
-            'habitacion_4': { gridX: 0, gridY: 0, paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: img2CaminosDer, link: null, hasDoor: false }, { dir: 2, img: img3Caminos, link: 'habitacion_3', hasDoor: false }, { dir: 3, img: img2CaminosIzq, link: 'habitacion_5', hasDoor: false }] },
-            'habitacion_5': { gridX: -1, gridY: 0, paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: imgPuertaSinPuerta, link: 'habitacion_4', hasDoor: false }, { dir: 2, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 3, img: imgPuertaSinPuerta, link: 'habitacion_6', hasDoor: false }] },
-            'habitacion_6': { gridX: -2, gridY: 0, paredes: [{ dir: 0, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 1, img: img2CaminosDer, link: 'habitacion_5', hasDoor: false }, { dir: 2, img: img3Caminos, link: 'habitacion_7', hasDoor: false }, { dir: 3, img: img2CaminosIzq, link: null, hasDoor: false }] },
-            'habitacion_7': { gridX: -2, gridY: 1, paredes: [{ dir: 0, img: imgPuertaConPuertaOFF, link: 'habitacion_6', hasDoor: true }, { dir: 1, img: imgCuartoCerrado, link: null, hasDoor: false }, { dir: 2, img: imgMesa1, link: null, hasDoor: false }, { dir: 3, img: imgCuartoCerrado, link: null, hasDoor: false }] }
+        const SALAS = {
+            final: [7, 0],  54: [14, 0],
+            38: [5, 1],  41: [7, 1],  50: [12, 1],  53: [14, 1],
+            32: [0, 2],  31: [1, 2],  36: [4, 2],  37: [5, 2],  39: [6, 2],  40: [7, 2],  42: [8, 2],
+            43: [9, 2],  45: [10, 2], 48: [11, 2], 49: [12, 2], 51: [13, 2], 52: [14, 2],
+            29: [1, 3],  30: [2, 3],  35: [4, 3],  44: [9, 3],  46: [10, 3], 47: [11, 3],
+            28: [1, 4],  33: [4, 4],  34: [5, 4],  72: [10, 4], 55: [11, 4], 56: [12, 4],
+            23: [1, 5],  22: [2, 5],  21: [3, 5],  20: [4, 5],  19: [7, 5],  73: [10, 5], 57: [11, 5], 62: [14, 5],
+            24: [1, 6],  14: [4, 6],  15: [5, 6],  16: [6, 6],  17: [7, 6],  75: [9, 6],  74: [10, 6],
+            58: [11, 6], 59: [12, 6], 60: [13, 6], 61: [14, 6],
+            27: [0, 7],  25: [1, 7],  13: [3, 7],  12: [4, 7],  18: [7, 7],  76: [10, 7], 64: [11, 7], 63: [14, 7],
+            26: [1, 8],  10: [4, 8],  11: [5, 8],  77: [10, 8], 65: [11, 8], 66: [12, 8],
+            9: [4, 9],   79: [9, 9],  78: [10, 9], 67: [11, 9],
+            8: [4, 10],  6: [5, 10],  5: [6, 10],  4: [7, 10],  82: [8, 10], 81: [9, 10], 80: [10, 10],
+            68: [11, 10], 69: [12, 10], 70: [13, 10],
+            7: [5, 11],  3: [7, 11],  71: [12, 11],
+            2: [7, 12],
+            1: [7, 13]
         };
+
+        const PASILLOS = [
+            // Inicio y pasillo de abajo
+            '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '6-8', '4-82', '82-81', '81-80',
+            // Columna izquierda central (8 → 36)
+            '8-9', '9-10', '10-11', '10-12', '12-13', '12-14', '14-20', '20-33', '33-34', '33-35', '35-36',
+            '14-15', '15-16', '16-17', '17-18', '17-19',
+            // Ala izquierda
+            '20-21', '21-22', '22-23', '23-24', '24-25', '25-26', '25-27',
+            '23-28', '28-29', '29-30', '29-31', '31-32',
+            // Pasillo de arriba y sala final
+            '36-37', '37-38', '37-39', '39-40', '40-41', '41-final', '40-42', '42-43', '43-44', '43-45',
+            // Columna 45 → 80
+            '45-46', '46-72', '72-73', '73-74', '74-75', '74-76', '76-77', '77-78', '78-79', '78-80',
+            // Columna 48 → 68 y ala derecha
+            '46-47', '47-48', '48-49', '49-50', '49-51', '51-52', '52-53', '53-54',
+            '47-55', '55-56', '55-57', '57-58', '58-59', '59-60', '60-61', '61-62', '61-63',
+            '58-64', '64-65', '65-66', '65-67', '67-68', '68-69', '69-70', '69-71'
+        ];
+
+        // Habitaciones especiales. Direcciones: 0 = arriba, 1 = derecha, 2 = abajo, 3 = izquierda
+        //   puerta: en qué pared está la puerta que se puede cerrar (donde aparece 001.jar)
+        //   paredes: paredes con una imagen propia
+        const ESPECIALES = {
+            7:     { puerta: 0, paredes: { 2: imgMesa1 } },
+            final: { paredes: { 0: imgMesaFinal } }
+        };
+
+        function construirMapa() {
+            const DX = [0, 1, 0, -1], DY = [-1, 0, 1, 0];
+            const m = {};
+            for (const id in SALAS) {
+                const [c, f] = SALAS[id];
+                m['habitacion_' + id] = { gridX: c - 7, gridY: f - 7, salidas: [null, null, null, null], paredes: [] };
+            }
+            PASILLOS.forEach(p => {
+                const [a, b] = p.split('-');
+                const A = SALAS[a], B = SALAS[b];
+                if (!A || !B) { console.warn('Pasillo con una habitación que no existe:', p); return; }
+                const dir = DX.findIndex((x, i) => x === B[0] - A[0] && DY[i] === B[1] - A[1]);
+                if (dir === -1) { console.warn('Estas habitaciones no están una al lado de la otra:', p); return; }
+                m['habitacion_' + a].salidas[dir] = 'habitacion_' + b;
+                m['habitacion_' + b].salidas[(dir + 2) % 4] = 'habitacion_' + a;
+            });
+            for (const key in m) {
+                const sala = m[key];
+                const esp = ESPECIALES[key.replace('habitacion_', '')] || {};
+                for (let d = 0; d < 4; d++) {
+                    const adelante = sala.salidas[d], izq = sala.salidas[(d + 3) % 4], der = sala.salidas[(d + 1) % 4];
+                    let img;
+                    if (!adelante) img = imgCuartoCerrado;
+                    else if (izq && der) img = img3Caminos;
+                    else if (izq) img = img2CaminosIzq;
+                    else if (der) img = img2CaminosDer;
+                    else img = imgPuertaSinPuerta;
+                    const hasDoor = esp.puerta === d;
+                    if (hasDoor) img = imgPuertaConPuertaOFF;
+                    if (esp.paredes && esp.paredes[d]) img = esp.paredes[d];
+                    sala.paredes.push({ dir: d, img, link: adelante, hasDoor });
+                }
+            }
+            return m;
+        }
+
+        const mapa = construirMapa();
 
         let currentRoom = 'habitacion_1', currentFacing = 0, currentRotation = 0;
         const btnLeft = $('btn-left'), btnRight = $('btn-right');
